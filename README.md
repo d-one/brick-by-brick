@@ -3,7 +3,7 @@ Repository for the SDS databricks brick-by-brick workshop
 
 # Content
 1. Setup Workspace
-    * Getting Access
+    * Getting Accesss
     * Setup Repos
 
 2. Data Engineering 
