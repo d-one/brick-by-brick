@@ -93,7 +93,7 @@ display(df_embedded)
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC # Exercise 1
+# MAGIC ## Exercise
 # MAGIC * Create a new table called `bronze_x2`
 # MAGIC * Write the `df_laptop` twice to the table `bronze_x2`
 # MAGIC * Run the assertion below to make sure you twice the amount of data as in table `bronze`
@@ -111,3 +111,24 @@ display(df_embedded)
 df_laptop_bronze_x2 = spark.table("bronze_x2")
 assert df_laptop_bronze.count() == df_laptop_bronze_x2.count()*2, "Your bronze_x2 table is not twice the size"
 # If there is no error message, your assertion is true.
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC Check the delta table history of your bronze_x2 table
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DESCRIBE HISTORY sds_catalog.robert_yousif.bronze_x2
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Conclusion
+# MAGIC * In this notebook you learned how to read a csv file from the Repos
+# MAGIC * Read a csv file and store it in a spark dataframe
+# MAGIC * Write the dataframe as a UC table inside your own schema
+# MAGIC * How to use SQL and embedded SQL in a python notebook
+# MAGIC
+# MAGIC **Next:** Go to the Silver Notebook and continue from there
