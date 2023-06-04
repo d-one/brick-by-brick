@@ -13,12 +13,20 @@ Repository for the SDS databricks brick-by-brick workshop
     * Create a data pipeline using databricks workflows.
 
 # Setup Workspace
-1. Login to the [workspace](https://adb-3967117302852551.11.azuredatabricks.net/?o=3967117302852551) using the email address you used to sign-up for the SDS workshop
-2. Adding the repository to your workspace
-    * Click on `Repos` in the Menu to the left
-    * Click on the directory with your email address.
-    * Click on `Add Repo` and paste this [URL](https://github.com/d-one/sds-brick-by-brick) into `Git repository` 
-3. ADD THE INSTRUCTION TO FIND THE FIRST NOTEBOOK
+Login to the [workspace](https://adb-3967117302852551.11.azuredatabricks.net/?o=3967117302852551) using the email address you used to sign-up for the SDS workshop
+
+## Adding the repository
+Adding the repository to your workspace: 
+   * Click on `Repos` in the Menu to the left
+   * Click on the directory with your email address.
+   * Click on `Add Repo` and paste this [URL](https://github.com/d-one/sds-brick-by-brick) into `Git repository` 
+
+## Create a personal cluster to your workspace.
+1. Click on the Compute tab in the left bar
+2. Click on Create compute and choose the following settings:
+3. Choose the `sds-compute-policy` Policy
+3. Make sure the `Single user access` is under your name
+4. Click on `Create Cluster`
 
 # Building a Data Pipeline in Databricks
 ## Configuring the Notebooks
