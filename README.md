@@ -17,9 +17,12 @@ Login to the [workspace](https://adb-3967117302852551.11.azuredatabricks.net/?o=
 
 ## Adding the repository
 Adding the repository to your workspace: 
-   * Click on `Repos` in the Menu to the left
-   * Click on the directory with your email address.
-   * Click on `Add Repo` and paste this [URL](https://github.com/d-one/sds-brick-by-brick) into `Git repository` 
+1. Click on `Repos` in the Menu to the left
+2. Click on the directory with your email address.
+3. Click on `Add Repo` and paste this [URL](https://github.com/d-one/sds-brick-by-brick) into `Git repository` 
+4. Click on `Create Repo` 
+
+Now you should see a repository named `sds-brick-by-brick` under your own directory.
 
 ## Create a personal cluster to your workspace.
 1. Click on the Compute tab in the left bar
@@ -28,8 +31,10 @@ Adding the repository to your workspace:
 3. Make sure the `Single user access` is under your name
 4. Click on `Create Cluster`
 
-# Building a Data Pipeline in Databricks
-## Configuring the Notebooks
-1. Go to the notebook `Bronze` and follow the instructions. 
-2. Go to the notebook `Silver` and follow the instructions. 
-3. Go to the notebook `Gold` and follow the instructions. 
+# 3 Notebooks - the medallion architecture
+Go to the following notebooks and follow the instructions:
+1. `Bronze`. 
+2. `Silver` 
+3. `Gold`
+
+# Creating the Workflow
