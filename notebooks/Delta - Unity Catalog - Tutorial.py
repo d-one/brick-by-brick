@@ -66,6 +66,10 @@ df.createOrReplaceTempView("temptable_python_laptop_data")
 
 # COMMAND ----------
 
+# test with new column and append
+
+# COMMAND ----------
+
 # MAGIC %sql
 # MAGIC SHOW VIEWS
 
@@ -167,7 +171,7 @@ print(df_v2.count())
 # MAGIC %md
 # MAGIC ### 4. Write to your own table inside your own catalog and schema
 # MAGIC
-# MAGIC Display table to make sure that you have been writing to it.
+# MAGIC Display table to make sure that you have been writing to it, or look at the histroy of the table.
 # MAGIC ```py
 # MAGIC display(spark.table(<catalog>.<schema>.<table_name>))
 # MAGIC ```
@@ -204,7 +208,7 @@ print(df_v2.count())
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Solution
+# MAGIC ## Solution
 
 # COMMAND ----------
 
@@ -220,7 +224,7 @@ df.write.format("delta").mode("append").saveAsTable("sds_catalog.default.laptop_
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC
+# MAGIC DESCRIBE DETAIL sds_catalog.default.laptop_data
 
 # COMMAND ----------
 

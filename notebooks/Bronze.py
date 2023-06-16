@@ -10,6 +10,8 @@
 
 # MAGIC %md
 # MAGIC Let's check if you can source the file using [dbutils](https://learn.microsoft.com/en-us/azure/databricks/dev-tools/databricks-utils)
+# MAGIC
+# MAGIC Make sure to change the `PATH` to your own directory.
 
 # COMMAND ----------
 
@@ -35,6 +37,17 @@ display(df_laptop_raw)
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ## Create Your Bronze Schema
+# MAGIC
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC CREATE SCHEMA IF NOT EXISTS robert_yousif.bronze
+
+# COMMAND ----------
+
 # MAGIC %md 
 # MAGIC # Writing a delta table to Unity Catalog
 
@@ -46,9 +59,9 @@ display(df_laptop_raw)
 
 # COMMAND ----------
 
-catalog_name = "sds_catalog"
-schema_name = "robert_yousif"
-table_name = "bronze"
+catalog_name = "robert_yousif"
+schema_name = "bronze"
+table_name = "laptop_prices"
 
 df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
@@ -59,10 +72,16 @@ df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_nam
 # MAGIC With the command above we are:
 # MAGIC * Specifying the format to be `delta`
 # MAGIC * Specifying `mode` to `overwrite` which will write over any existing data on the table (if any, otherwise it will get created)
+# MAGIC
+# MAGIC
+# MAGIC What would be the difference between `append` and `overwrite` in terms of the:
+# MAGIC   * How your table would look like?
+# MAGIC   * The space used for the data? (Think about how historization and vacuum works)
 
 # COMMAND ----------
 
 # MAGIC %md 
+# MAGIC ### Read the data
 # MAGIC Load the data from the Unity Catalog to see that it exists.
 
 # COMMAND ----------
@@ -92,11 +111,20 @@ display(df_embedded)
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### Exit notebook when running as a workflow task
+
+# COMMAND ----------
+
+dbutils.notebook.exit("End of notebook when running as a workflow task")
+
+# COMMAND ----------
+
 # MAGIC %md 
 # MAGIC ## Exercise
-# MAGIC * Create a new table called `bronze_x2`
-# MAGIC * Write the `df_laptop` twice to the table `bronze_x2`
-# MAGIC * Run the assertion below to make sure you twice the amount of data as in table `bronze`
+# MAGIC * Create a new table called `laptop_prices_dev`
+# MAGIC * Write the `df_laptop` to the table `laptop_prices_dev` using both `append` and `overwrite` to create some history.
+# MAGIC * Check the table history columns `operation`& `operationMetrics`
 
 # COMMAND ----------
 
@@ -109,7 +137,7 @@ display(df_embedded)
 # COMMAND ----------
 
 df_laptop_bronze_x2 = spark.table("bronze_x2")
-assert df_laptop_bronze.count() == df_laptop_bronze_x2.count()*2, "Your bronze_x2 table is not twice the size"
+assert df_laptop_bronze.count() == df_laptop_bronze_x2.count()>2, "Your bronze_x2 table is not twice the size"
 # If there is no error message, your assertion is true.
 
 # COMMAND ----------
@@ -120,7 +148,7 @@ assert df_laptop_bronze.count() == df_laptop_bronze_x2.count()*2, "Your bronze_x
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC DESCRIBE HISTORY sds_catalog.robert_yousif.bronze_x2
+# MAGIC DESCRIBE HISTORY robert_yousif.bronze.laptop_prices
 
 # COMMAND ----------
 
