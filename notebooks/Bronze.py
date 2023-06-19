@@ -15,7 +15,8 @@
 
 # COMMAND ----------
 
-path = "file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/laptop_data.csv"
+# path = "file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/laptop_data.csv"
+path = "file:/Workspace/Repos/spyros.cavadias@ms.d-one.ai/sds-brick-by-brick/data/laptop_price_euro.csv"
 
 dbutils.fs.ls(path)
 
@@ -44,7 +45,7 @@ display(df_laptop_raw)
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS robert_yousif.bronze
+# MAGIC CREATE SCHEMA IF NOT EXISTS spyros_cavadias.bronze
 
 # COMMAND ----------
 
@@ -59,9 +60,9 @@ display(df_laptop_raw)
 
 # COMMAND ----------
 
-catalog_name = "robert_yousif"
+catalog_name = "spyros_cavadias"
 schema_name = "bronze"
-table_name = "laptop_prices"
+table_name = "laptop_prices_euro"
 
 df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
@@ -97,7 +98,8 @@ df_laptop_bronze = spark.table(f"{catalog_name}.{schema_name}.{table_name}")
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT * FROM sds_catalog.robert_yousif.bronze
+# MAGIC -- SELECT * FROM sds_catalog.robert_yousif.bronze
+# MAGIC SELECT * FROM spyros_cavadias.bronze.laptop_prices_euro
 
 # COMMAND ----------
 

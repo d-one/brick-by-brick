@@ -2,8 +2,8 @@
 # MAGIC  %md-sandbox
 # MAGIC
 # MAGIC <div style="text-align: left; line-height: 0; padding-top: 9px;">
-# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 600px">
-# MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 800px">
+# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 400px">
+# MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 400px">
 # MAGIC </div>
 
 # COMMAND ----------
@@ -25,12 +25,11 @@
 
 # COMMAND ----------
 
-data_file_path = "dbfs:/FileStore/shared_uploads/spyros.cavadias@ms.d-one.ai/airbnb_clean_dataset.csv"
-try:
-    airbnb_df = spark.read.format("csv").option("header", "true").load(data_file_path).toPandas().astype("float")
-except:
-    print("Data file not in DBFS, please re-upload it/")
+catalog_name = "spyros_cavadias"
+schema_name = "silver"
+table_name = "features"
 
+df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
 
@@ -95,12 +94,23 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
-X_train, X_test, y_train, y_test = train_test_split(airbnb_df.drop(["price"], axis=1), airbnb_df[["price"]].values.ravel(), random_state=42)
+# COMMAND ----------
+
+# one-hot encode categorical columns 
+#categorical data
+categorical_cols = ['Company', 'TypeName', 'operating_system','memory_type','cpu_manufacturer','gpu_manufacturer']
+# get_dummies
+enriched_df = pd.get_dummies(df, columns = categorical_cols)
+
+# train test split 
+X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Price_euros"], axis=1), enriched_df[["Price_euros"]].values.ravel(), test_size=0.1, random_state=42)
+
 
 # COMMAND ----------
 
 # set experiment name 
-experiment = mlflow.set_experiment("/Users/spyros.cavadias@ms.d-one.ai/LUKB/LUKB_DEMO")
+email = "spyros.cavadias@ms.d-one.ai"
+experiment = mlflow.set_experiment(f"/Users/{email}/sds_mlflow_experiment")
 
 # COMMAND ----------
 
@@ -122,7 +132,7 @@ with mlflow.start_run(run_name="LR Model Autolog") as run:
 
 # COMMAND ----------
 
-model_name = f"Demo_Serving_sklearn_lr"
+model_name = f"{catalog_name}_lr_model"
 model_name
 
 # COMMAND ----------
@@ -183,7 +193,7 @@ model_version_details.status
 
 client.update_registered_model(
     name=model_details.name,
-    description="This model forecasts Airbnb housing list prices based on various listing inputs."
+    description="This model forecasts laptop prices based on various handcrafted features."
 )
 
 # COMMAND ----------
