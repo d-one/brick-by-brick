@@ -1,4 +1,27 @@
 # Databricks notebook source
+# MAGIC  %md-sandbox
+# MAGIC
+# MAGIC <div style="text-align: left; line-height: 0; padding-top: 9px;">
+# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 300px">
+# MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 400px">
+# MAGIC </div>
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC
+# MAGIC # Pre processing
+# MAGIC
+# MAGIC In any data science project, feaure engineering is very important  seeks to address these folowing points:
+# MAGIC
+# MAGIC * Analyze your data and figure out what to use from them 
+# MAGIC * Define and extract a set of features that represent data that's important for the analysis (feature extraction)
+# MAGIC * Transform a particular set of input features to make a new set of more effective features (feature construction)
+# MAGIC
+# MAGIC In this notebook, we will do some basic analysis of our data and finalize a set of features to be used in our ML modeling.
+
+# COMMAND ----------
+
 import pandas as pd
 import numpy as np
 import re
@@ -131,4 +154,8 @@ features_sdf.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name
 
 # COMMAND ----------
 
-
+# MAGIC %md
+# MAGIC # Conclusion
+# MAGIC * In this notebook you feature engineered your dataset for the upcoming ML task
+# MAGIC
+# MAGIC **Next:** Go to the MLflow Tracking notebook and continue from there

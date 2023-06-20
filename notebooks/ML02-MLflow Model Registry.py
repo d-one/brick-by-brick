@@ -2,16 +2,13 @@
 # MAGIC  %md-sandbox
 # MAGIC
 # MAGIC <div style="text-align: left; line-height: 0; padding-top: 9px;">
-# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 400px">
+# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 300px">
 # MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 400px">
 # MAGIC </div>
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="04aa5a94-e0d3-4bec-a9b5-a0590c33a257"/>
-# MAGIC
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC # Model Registry
 # MAGIC
 # MAGIC MLflow Model Registry is a collaborative hub where teams can share ML models, work together from experimentation to online testing and production, integrate with approval and governance workflows, and monitor ML deployments and their performance.  This notebook explores how to manage models using the MLflow model registry.
@@ -25,15 +22,7 @@
 
 # COMMAND ----------
 
-catalog_name = "spyros_cavadias"
-schema_name = "silver"
-table_name = "features"
-
-df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
-
-# COMMAND ----------
-
-# MAGIC %md-sandbox <i18n value="5802ff47-58b5-4789-973d-2fb855bf347a"/>
+# MAGIC %md-sandbox <i18n value="fe857eeb-6119-4927-ad79-77eaa7bffe3a"/>
 # MAGIC
 # MAGIC
 # MAGIC
@@ -55,7 +44,7 @@ df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="7f34f7da-b5d2-42af-b24d-54e1730db95f"/>
+# MAGIC %md
 # MAGIC
 # MAGIC
 # MAGIC
@@ -67,7 +56,7 @@ df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="cbc59424-e45b-4179-a586-8c14a66a61a1"/>
+# MAGIC %md
 # MAGIC
 # MAGIC
 # MAGIC
@@ -93,6 +82,14 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
+
+# COMMAND ----------
+
+catalog_name = "spyros_cavadias"
+schema_name = "silver"
+table_name = "features"
+
+df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
 
@@ -122,8 +119,7 @@ with mlflow.start_run(run_name="LR Model Autolog") as run:
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="1322cac5-9638-4cc9-b050-3545958f3936"/>
-# MAGIC
+# MAGIC %md
 # MAGIC
 # MAGIC
 # MAGIC Create a unique model name so you don't clash with other workspace users. 
@@ -137,7 +133,7 @@ model_name
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="0777e3f5-ba7c-41c4-a477-9f0a5a809664"/>
+# MAGIC %md
 # MAGIC
 # MAGIC
 # MAGIC
@@ -152,8 +148,7 @@ model_details = mlflow.register_model(model_uri=model_uri, name=model_name)
 
 # COMMAND ----------
 
-# MAGIC %md-sandbox <i18n value="22756858-ff7f-4392-826f-f401a81230c4"/>
-# MAGIC
+# MAGIC %md-sandbox <i18n value="fe857eeb-6119-4927-ad79-77eaa7bffe3a"/>
 # MAGIC
 # MAGIC
 # MAGIC  **Open the *Models* tab on the left of the screen to explore the registered model.**  Note the following:<br><br>
@@ -198,9 +193,7 @@ client.update_registered_model(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="5abeafb2-fd60-4b0d-bf52-79320c10d402"/>
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC
 # MAGIC Add a version-specific description.
 
@@ -214,10 +207,7 @@ client.update_model_version(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="aaac467f-3a52-4428-a119-8286cb0ac158"/>
-# MAGIC
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC ### Deploying a Model
 # MAGIC
 # MAGIC The MLflow Model Registry defines several model stages: **`None`**, **`Staging`**, **`Production`**, and **`Archived`**. Each stage has a unique meaning. For example, **`Staging`** is meant for model testing, while **`Production`** is for models that have completed the testing or review processes and have been deployed to applications. 
@@ -226,8 +216,7 @@ client.update_model_version(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="dff93671-f891-4779-9e41-a0960739516f"/>
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC
 # MAGIC Now that you've learned about stage transitions, transition the model to the **`Production`** stage.
@@ -248,9 +237,7 @@ client.transition_model_version_stage(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="4dc7e8b7-da38-4ce1-a238-39cad74d97c5"/>
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC
 # MAGIC Fetch the model's current status.
 
@@ -264,9 +251,7 @@ print(f"The current model stage is: '{model_version_details.current_stage}'")
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="ba563293-bb74-4318-9618-a1dcf86ec7a3"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Fetch the latest model using a **`pyfunc`**.  Loading the model in this way allows us to use the model regardless of the package that was used to train it.
 # MAGIC
@@ -283,9 +268,7 @@ model_version_1 = mlflow.pyfunc.load_model(model_version_uri)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="e1bb8ae5-6cf3-42c2-aebd-bde925a9ef30"/>
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC
 # MAGIC Apply the model.
 
@@ -295,9 +278,7 @@ model_version_1.predict(X_test)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="75a9c277-0115-4cef-b4aa-dd69a0a5d8a0"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC ### Deploying a New Model Version
 # MAGIC
@@ -305,9 +286,7 @@ model_version_1.predict(X_test)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="2ef7acd0-422a-4449-ad27-3a26f217ab15"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Create a new model version and register that model when it's logged.
 
@@ -335,9 +314,7 @@ with mlflow.start_run(run_name="LR Ridge Model") as run:
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="dc1dd6b4-9e9e-45be-93c4-5500a10191ed"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Put the new model into staging.
 
@@ -365,10 +342,7 @@ client.transition_model_version_stage(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="6f568dd2-0413-4b78-baf6-23debb8a5118"/>
-# MAGIC
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC Use the search functionality to grab the latest model version.
 
 # COMMAND ----------
@@ -378,9 +352,7 @@ new_model_version = max([model_version_info.version for model_version_info in mo
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="4fb5d7c9-b0c0-49d5-a313-ac95da7e0f91"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Add a description to this new version.
 
@@ -394,9 +366,7 @@ client.update_model_version(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="10adff21-8116-4a01-a309-ce5a7d233fcf"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Since this model is now in staging, you can execute an automated CI/CD pipeline against it to test it before going into production.  Once that is completed, you can push that model into production.
 
@@ -411,9 +381,7 @@ client.transition_model_version_stage(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="e3caaf08-a721-425b-8765-050c757d1d2e"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Delete version 1.  
 # MAGIC
@@ -428,9 +396,7 @@ client.delete_model_version(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="a896f3e5-d83c-4328-821f-a67d60699f0e"/>
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC
 # MAGIC Archive version 2 of the model too.
 
@@ -444,9 +410,7 @@ client.transition_model_version_stage(
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="0eb4929d-648b-4ae6-bca3-aff8af50f15f"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Now delete the entire registered model.
 
@@ -456,9 +420,7 @@ client.delete_registered_model(model_name)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="6fe495ec-f481-4181-a006-bea55a6cef09"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC ## Review
 # MAGIC **Question:** How does MLflow tracking differ from the model registry?  
@@ -472,9 +434,7 @@ client.delete_registered_model(model_name)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="ecf5132e-f80d-4374-a325-28b4e96d5b61"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC ## Topics & Resources on the MLflow Model Registry
 # MAGIC

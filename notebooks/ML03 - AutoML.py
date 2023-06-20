@@ -2,16 +2,13 @@
 # MAGIC  %md-sandbox
 # MAGIC
 # MAGIC <div style="text-align: left; line-height: 0; padding-top: 9px;">
-# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 600px">
-# MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 800px">
+# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 300px">
+# MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 400px">
 # MAGIC </div>
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="2630af5a-38e6-482e-87f1-1a1633438bb6"/>
-# MAGIC
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC # AutoML
 # MAGIC
 # MAGIC <a href="https://docs.databricks.com/applications/machine-learning/automl.html" target="_blank">Databricks AutoML</a> helps you automatically build machine learning models both through a UI and programmatically. It prepares the dataset for model training and then performs and records a set of trials (using HyperOpt), creating, tuning, and evaluating multiple models. 
@@ -31,23 +28,29 @@
 
 # COMMAND ----------
 
-data_file_path = "dbfs:/FileStore/shared_uploads/spyros.cavadias@ms.d-one.ai/airbnb_clean_dataset.csv"
-try:
-    airbnb_df = spark.read.format("csv").option("header", "true").load(data_file_path).toPandas().astype("float")
-except:
-    print("Data file not in DBFS, please re-upload it/")
+catalog_name = "spyros_cavadias"
+schema_name = "silver"
+table_name = "features"
+
+df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
 
 from sklearn.model_selection import train_test_split
+import pandas as pd
 
-train_df, test_df, _, _ = train_test_split(airbnb_df, airbnb_df[["price"]].values.ravel(), random_state=42)
+# one-hot encode categorical columns 
+#categorical data
+categorical_cols = ['Company', 'TypeName', 'operating_system','memory_type','cpu_manufacturer','gpu_manufacturer']
+# get_dummies
+enriched_df = pd.get_dummies(df, columns = categorical_cols)
+
+# train test split 
+train_df, test_df, _, _ = train_test_split(enriched_df, enriched_df[["Price_euros"]].values.ravel(), test_size=0.1, random_state=42)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="1b5c8a94-3ac2-4977-bfe4-51a97d83ebd9"/>
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC
 # MAGIC We can now use AutoML to search for the optimal <a href="https://docs.databricks.com/applications/machine-learning/automl.html#regression" target="_blank">regression</a> model. 
 # MAGIC
@@ -64,13 +67,11 @@ train_df, test_df, _, _ = train_test_split(airbnb_df, airbnb_df[["price"]].value
 
 from databricks import automl
 
-summary = automl.regress(train_df, target_col="price", primary_metric="rmse", timeout_minutes=5, max_trials=10)
+summary = automl.regress(train_df, target_col="Price_euros", primary_metric="rmse", timeout_minutes=5, max_trials=10)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="57d884c6-2099-4f34-b840-a4e873308ffe"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC  
 # MAGIC
 # MAGIC After running the previous cell, you will notice two notebooks and an MLflow experiment:
@@ -88,8 +89,7 @@ print(summary.best_trial)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="3c0cd1ec-8965-4af3-896d-c30938033abf"/>
-# MAGIC
+# MAGIC %md
 # MAGIC
 # MAGIC
 # MAGIC Now we can test the model that we got from AutoML against our test data. We'll be using <a href="https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.spark_udf" target="_blank">mlflow.pyfunc.spark_udf</a> to register our model as a UDF and apply it in parallel to our test data.
@@ -103,14 +103,14 @@ model_uri = f"runs:/{summary.best_trial.mlflow_run_id}/model"
 
 predict = mlflow.pyfunc.spark_udf(spark, model_uri)
 test_sdf = spark.createDataFrame(test_df)
-pred_sdf = test_sdf.withColumn("prediction", predict(*test_sdf.drop("price").columns))
+pred_sdf = test_sdf.withColumn("prediction", predict(*test_sdf.drop("Price_euros").columns))
 display(pred_sdf)
 
 # COMMAND ----------
 
 from pyspark.ml.evaluation import RegressionEvaluator
 
-regression_evaluator = RegressionEvaluator(predictionCol="prediction", labelCol="price", metricName="rmse")
+regression_evaluator = RegressionEvaluator(predictionCol="prediction", labelCol="Price_euros", metricName="rmse")
 rmse = regression_evaluator.evaluate(pred_sdf)
 print(f"RMSE on test dataset: {rmse:.3f}")
 

@@ -2,15 +2,13 @@
 # MAGIC  %md-sandbox
 # MAGIC
 # MAGIC <div style="text-align: left; line-height: 0; padding-top: 9px;">
-# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 400px">
+# MAGIC   <img src="https://s3.eu-central-1.amazonaws.com/co.lever.eu.client-logos/c2f22a4d-adbd-49a9-a9ca-c24c0bd5dc1a-1607101144408.png" alt="D ONE" style="width: 300px">
 # MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 400px">
 # MAGIC </div>
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="b27f81af-5fb6-4526-b531-e438c0fda55e"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC # MLflow
 # MAGIC
@@ -27,29 +25,12 @@
 # COMMAND ----------
 
 # MAGIC %md <i18n value="b7c8a0e0-649e-4814-8310-ae6225a57489"/>
-# MAGIC <div><img src="https://files.training.databricks.com/images/eLearning/ML-Part-4/mlflow-tracking.png" style="height: 400px; margin: 20px"/></div>
+# MAGIC
+# MAGIC <div><img src="https://files.training.databricks.com/images/eLearning/ML-Part-4/mlflow-tracking.png" style="height: 300px; margin: 20px"/></div>
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="c1a29688-f50a-48cf-9163-ebcc381dfe38"/>
-# MAGIC
-# MAGIC
-# MAGIC
-# MAGIC Let's start by loading in our dataset.
-
-# COMMAND ----------
-
-catalog_name = "spyros_cavadias"
-schema_name = "silver"
-table_name = "features"
-
-df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
-
-# COMMAND ----------
-
-# MAGIC %md <i18n value="9ab8c080-9012-4f38-8b01-3846c1531a80"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC ### MLflow Tracking
 # MAGIC
@@ -59,10 +40,7 @@ df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="82786653-4926-4790-b867-c8ccb208b451"/>
-# MAGIC
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC ### Track Runs
 # MAGIC
 # MAGIC Each run can record the following information:<br><br>
@@ -85,6 +63,20 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from math import sqrt, log, exp
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC
+# MAGIC Let's start by loading in our dataset.
+
+# COMMAND ----------
+
+catalog_name = "spyros_cavadias"
+schema_name = "silver"
+table_name = "features"
+
+df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
 
@@ -128,9 +120,7 @@ with mlflow.start_run(run_name="LR-Numerical-Features") as run:
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="44bc7cac-de4a-47e7-bfff-6d2eb58172cd"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC There, all done! Let's go through the other two linear regression models and then compare our runs. 
 # MAGIC
@@ -164,9 +154,7 @@ with mlflow.start_run(run_name="LR-All-Features") as run:
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="70188282-8d26-427d-b374-954e9a058000"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Finally, we will use Linear Regression to predict the log of the price, due to its log normal distribution. 
 # MAGIC
@@ -208,17 +196,13 @@ with mlflow.start_run(run_name="LR-Log-Price") as run:
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="66785d5e-e1a7-4896-a8a9-5bfcd18acc5c"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC That's it! Now, let's use MLflow to easily look over our work and compare model performance. You can either query past runs programmatically or use the MLflow UI.
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="0b1a68e1-bd5d-4f78-a452-90c7ebcdef39"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC ### Querying Past Runs
 # MAGIC
@@ -232,9 +216,7 @@ client = MlflowClient()
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="dcd771b2-d4ed-4e9c-81e5-5a3f8380981f"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC You can also use <a href="https://mlflow.org/docs/latest/search-syntax.html" target="_blank">search_runs</a> to find all runs for a given experiment.
 
@@ -247,9 +229,7 @@ display(runs_df)
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="68990866-b084-40c1-beee-5c747a36b918"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC Pull the last run and look at metrics.
 
@@ -264,9 +244,7 @@ runs[0].info.run_id
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="cfbbd060-6380-444f-ba88-248e10a56559"/>
-# MAGIC
-# MAGIC
+# MAGIC %md
 # MAGIC
 # MAGIC Examine the results in the UI.  Look for the following:<br><br>
 # MAGIC
@@ -287,9 +265,7 @@ runs[0].info.run_id
 
 # COMMAND ----------
 
-# MAGIC %md <i18n value="63ca7584-2a86-421b-a57e-13d48db8a75d"/>
-# MAGIC
-# MAGIC
+# MAGIC %md 
 # MAGIC
 # MAGIC ### Load Saved Model
 # MAGIC
