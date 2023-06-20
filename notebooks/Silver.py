@@ -4,7 +4,7 @@
 # MAGIC Namespace
 # MAGIC * Catalog = sds_catalog
 # MAGIC * Schema = default
-# MAGIC * Table = laptop_data
+# MAGIC * Table = laptop_prices
 
 # COMMAND ----------
 
@@ -23,23 +23,23 @@ df_bronze.printSchema()
 # COMMAND ----------
 
 from pyspark.sql.functions import expr
-from pyspark.sql.types import StringType, DateType, FloatType
+from pyspark.sql.types import StringType, DateType, FloatType, IntegerType
 
 df_laptop_bronze = spark.table("robert_yousif.bronze.laptop_prices")
 
 df_laptop_silver = (
     df_bronze.withColumn("Inches", df_bronze["Inches"].cast(FloatType()))
-    .withColumn("Price", df_bronze["Price"].cast(FloatType()))
-    .withColumn("_c0", df_bronze["_c0"].cast(IntegerType()))
-    .withColumnRenamed("_c0", "Id")
+    .withColumn("Price_euros", df_bronze["Price_euros"].cast(FloatType()))
+    .withColumn("laptop_ID", df_bronze["laptop_ID"].cast(IntegerType()))
     .withColumn("Weight", expr("substring(Weight, 0, length(Weight)-2)").cast(FloatType()))
     .withColumnRenamed("Weight", "Weight_Kg")
-    .withColumnRenamed("Price", "Price_INR")
-
 )
 
-
 display(df_laptop_silver)
+
+# COMMAND ----------
+
+df_laptop_silver.printSchema()
 
 # COMMAND ----------
 
@@ -79,11 +79,11 @@ display(spark.table(f"{catalog_name}.{schema_name}.{table_name}"))
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Exercise
-# MAGIC Go check out the lineage of the table produced by Unity Catalog inside the Data Explorer
-# MAGIC 1. Click on the `Data` tab in the left panel
-# MAGIC 2. Find your table
-# MAGIC 3. Check out the lineage table and graph for both `Tables` and `Notebooks`
+# MAGIC ### Exit notebook when running as a workflow task
+
+# COMMAND ----------
+
+dbutils.notebook.exit("End of notebook when running as a workflow task")
 
 # COMMAND ----------
 
@@ -97,7 +97,7 @@ display(spark.table(f"{catalog_name}.{schema_name}.{table_name}"))
 # COMMAND ----------
 
 df_laptop_silver_mergeSchema = (
-    df_laptop_silver.withColumnRenamed("Weight", "Weight_kilogram")
+    df_laptop_silver.withColumnRenamed("Weight", "Weight_Kg")
 )
 
 # COMMAND ----------
@@ -110,7 +110,7 @@ df_laptop_silver_mergeSchema = (
 (df_laptop_silver_mergeSchema
     .write.format("delta")
     .mode("overwrite")
-    .saveAsTable(f"{catalog_name}.{schema_name}.{table_name}"))
+    .saveAsTable(f"{catalog_name}.{schema_name}.{table_name}_testmerge"))
 
 # COMMAND ----------
 
@@ -119,4 +119,4 @@ df_laptop_silver_mergeSchema = (
 
 # COMMAND ----------
 
-df_laptop_silver_mergeSchema.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+df_laptop_silver_mergeSchema.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}_testmerge")

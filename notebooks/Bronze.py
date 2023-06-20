@@ -15,8 +15,7 @@
 
 # COMMAND ----------
 
-# path = "file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/laptop_data.csv"
-path = "file:/Workspace/Repos/spyros.cavadias@ms.d-one.ai/sds-brick-by-brick/data/laptop_price_euro.csv"
+path = "file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/laptop_price_euro.csv"
 
 dbutils.fs.ls(path)
 
@@ -38,14 +37,8 @@ display(df_laptop_raw)
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC ## Create Your Bronze Schema
-# MAGIC
-
-# COMMAND ----------
-
 # MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS spyros_cavadias.bronze
+# MAGIC CREATE SCHEMA IF NOT EXISTS robert_yousif.bronze
 
 # COMMAND ----------
 
@@ -55,14 +48,20 @@ display(df_laptop_raw)
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ## Create Your Bronze Schema
+# MAGIC
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC
 # MAGIC Save the dataframe as a delta table inside the unity catalog
 
 # COMMAND ----------
 
-catalog_name = "spyros_cavadias"
+catalog_name = "robert_yousif"
 schema_name = "bronze"
-table_name = "laptop_prices_euro"
+table_name = "laptop_prices"
 
 df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
@@ -88,7 +87,7 @@ df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_nam
 # COMMAND ----------
 
 df_laptop_bronze = spark.table(f"{catalog_name}.{schema_name}.{table_name}")
-
+display(df_laptop_bronze)
 
 # COMMAND ----------
 
@@ -98,8 +97,7 @@ df_laptop_bronze = spark.table(f"{catalog_name}.{schema_name}.{table_name}")
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC -- SELECT * FROM sds_catalog.robert_yousif.bronze
-# MAGIC SELECT * FROM spyros_cavadias.bronze.laptop_prices_euro
+# MAGIC SELECT * FROM sds_catalog.robert_yousif.bronze
 
 # COMMAND ----------
 
@@ -138,19 +136,13 @@ dbutils.notebook.exit("End of notebook when running as a workflow task")
 
 # COMMAND ----------
 
-df_laptop_bronze_x2 = spark.table("bronze_x2")
-assert df_laptop_bronze.count() == df_laptop_bronze_x2.count()>2, "Your bronze_x2 table is not twice the size"
-# If there is no error message, your assertion is true.
-
-# COMMAND ----------
-
 # MAGIC %md 
-# MAGIC Check the delta table history of your bronze_x2 table
+# MAGIC Check the delta table history of your `laptop_prices_dev`
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC DESCRIBE HISTORY robert_yousif.bronze.laptop_prices
+# MAGIC DESCRIBE HISTORY robert_yousif.bronze.laptop_prices_dev
 
 # COMMAND ----------
 
