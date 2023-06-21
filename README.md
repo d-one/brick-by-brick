@@ -11,7 +11,7 @@ Repository for the SDS databricks brick-by-brick workshop
    * Upload data to Unity Catalog
    * Time Travel + Installing Libraries
 
-3 Medallion Architecture & Workflow Orchestration
+3. Medallion Architecture & Workflow Orchestration
    * 3 Notebooks - Medallion architecture 
    * Creating a Workflow Job
 
