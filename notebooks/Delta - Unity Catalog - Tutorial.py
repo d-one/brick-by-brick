@@ -8,7 +8,7 @@
 
 # COMMAND ----------
 
-df = spark.table("sds_catalog.default.laptop_data")
+df = spark.table("sds_catalog.default.laptop_price_euro")
 display(df)
 
 # COMMAND ----------
@@ -20,7 +20,7 @@ display(df)
 
 # MAGIC %sql
 # MAGIC
-# MAGIC SELECT * FROM sds_catalog.default.laptop_data
+# MAGIC SELECT * FROM sds_catalog.default.laptop_price_euro
 
 # COMMAND ----------
 
@@ -29,7 +29,7 @@ display(df)
 
 # COMMAND ----------
 
-df = spark.sql("SELECT * FROM sds_catalog.default.laptop_data")
+df = spark.sql("SELECT * FROM sds_catalog.default.laptop_price_euro")
 
 # COMMAND ----------
 
@@ -41,7 +41,7 @@ df = spark.sql("SELECT * FROM sds_catalog.default.laptop_data")
 # MAGIC %sql
 # MAGIC CREATE OR REPLACE TEMPORARY VIEW temptable_sql_laptop_data
 # MAGIC AS
-# MAGIC SELECT * FROM sds_catalog.default.laptop_data
+# MAGIC SELECT * FROM sds_catalog.default.laptop_price_euro
 
 # COMMAND ----------
 
@@ -60,7 +60,7 @@ display(df)
 
 # COMMAND ----------
 
-df = spark.table("sds_catalog.default.laptop_data")
+df = spark.table("sds_catalog.default.laptop_price_euro")
 df.createOrReplaceTempView("temptable_python_laptop_data")
 
 
@@ -81,21 +81,21 @@ df.createOrReplaceTempView("temptable_python_laptop_data")
 # COMMAND ----------
 
 
-df = spark.table("sds_catalog.default.laptop_data")
-df.write.format("delta").mode("append").saveAsTable("sds_catalog.default.laptop_data")
+df = spark.table("sds_catalog.default.laptop_price_euro")
+df.write.format("delta").mode("append").saveAsTable("sds_catalog.default.laptop_price_euro")
 
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC DESCRIBE HISTORY sds_catalog.default.laptop_data
+# MAGIC DESCRIBE HISTORY sds_catalog.default.laptop_price_euro
 
 # COMMAND ----------
 
-df_v1 = spark.table("sds_catalog.default.laptop_data@v0")
+df_v1 = spark.table("sds_catalog.default.laptop_price_euro@v0")
 print(df_v1.count())
 
-df_v2 = spark.table("sds_catalog.default.laptop_data@v1")
+df_v2 = spark.table("sds_catalog.default.laptop_price_euro@v1")
 print(df_v2.count())
 
 # COMMAND ----------
@@ -106,7 +106,7 @@ print(df_v2.count())
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT count(*) FROM sds_catalog.default.laptop_data VERSION AS OF 0
+# MAGIC SELECT count(*) FROM sds_catalog.default.laptop_price_euro VERSION AS OF 0
 
 # COMMAND ----------
 
@@ -167,7 +167,7 @@ print(df_v2.count())
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### 4. Write to your own table inside your own catalog and schema
+# MAGIC ### 4. Write to your own table inside your own catalog and the default schema
 # MAGIC
 # MAGIC Display table to make sure that you have been writing to it, or look at the histroy of the table.
 # MAGIC ```py
@@ -210,14 +210,15 @@ print(df_v2.count())
 
 # COMMAND ----------
 
-path = "file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/laptop_data.csv"
-dbutils.fs.ls("file:/Workspace/Users/robert.yousif@ms.d-one.ai/path-to-file")
+path = "file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/laptop_price_euro.csv"
+dbutils.fs.ls("file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/")
 
 # COMMAND ----------
 
 df = spark.read.format("csv").option("header", "true").load(path)
 display(df)
-df.write.format("delta").mode("append").saveAsTable("sds_catalog.default.laptop_data")
+df.write.format("delta").mode("append").saveAsTable("sds_catalog.default.laptop_price_euro")
+#
 
 # COMMAND ----------
 
