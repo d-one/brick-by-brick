@@ -15,7 +15,13 @@
 
 # COMMAND ----------
 
-path = "file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/laptop_price_euro.csv"
+# set up the below params
+user_email = "robert.yousif@ms.d-one.ai"
+user_name = "robert_yousif"
+
+# COMMAND ----------
+
+path = f"file:/Workspace/Repos/{user_email}/sds-brick-by-brick/data/laptop_price_euro.csv"
 
 dbutils.fs.ls(path)
 
@@ -37,8 +43,11 @@ display(df_laptop_raw)
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS robert_yousif.bronze
+spark.sql(
+    f"""
+    CREATE SCHEMA IF NOT EXISTS {user_email}.bronze
+    """
+)
 
 # COMMAND ----------
 
@@ -59,7 +68,7 @@ display(df_laptop_raw)
 
 # COMMAND ----------
 
-catalog_name = "robert_yousif"
+catalog_name = user_name
 schema_name = "bronze"
 table_name = "laptop_prices"
 
@@ -88,16 +97,6 @@ df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_nam
 
 df_laptop_bronze = spark.table(f"{catalog_name}.{schema_name}.{table_name}")
 display(df_laptop_bronze)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC Load the data using SQL
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT * FROM sds_catalog.robert_yousif.bronze
 
 # COMMAND ----------
 
@@ -141,8 +140,11 @@ dbutils.notebook.exit("End of notebook when running as a workflow task")
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC DESCRIBE HISTORY robert_yousif.bronze.laptop_prices_dev
+spark.sql(
+    f"""
+    DESCRIBE HISTORY IF NOT EXISTS {catalog_name}.{schema_name}.{table_name}
+    """
+)
 
 # COMMAND ----------
 
