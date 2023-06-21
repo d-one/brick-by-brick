@@ -28,7 +28,13 @@
 
 # COMMAND ----------
 
-catalog_name = "spyros_cavadias"
+# set up the below params
+user_email = "spyros.cavadias@ms.d-one.ai"
+user_name = "spyros_cavadias"
+
+# COMMAND ----------
+
+catalog_name = user_name
 schema_name = "silver"
 table_name = "features"
 

@@ -72,7 +72,13 @@ from math import sqrt, log, exp
 
 # COMMAND ----------
 
-catalog_name = "spyros_cavadias"
+# set up the below params
+user_email = "spyros.cavadias@ms.d-one.ai"
+user_name = "spyros_cavadias"
+
+# COMMAND ----------
+
+catalog_name = user_name
 schema_name = "silver"
 table_name = "features"
 
@@ -93,8 +99,7 @@ X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Price_eur
 # COMMAND ----------
 
 # set experiment name 
-email = "spyros.cavadias@ms.d-one.ai"
-experiment = mlflow.set_experiment(f"/Users/{email}/sds_mlflow_experiment")
+experiment = mlflow.set_experiment(f"/Users/{user_email}/sds_mlflow_experiment")
 
 # COMMAND ----------
 
