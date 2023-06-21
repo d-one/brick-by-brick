@@ -3,14 +3,18 @@ Repository for the SDS databricks brick-by-brick workshop
 
 # Content
 1. Setup Workspace
-    * Getting Accesss
-    * Setup Repos
+    * Adding the repository
+    * Create a personal cluster
 
-2. Data Engineering 
-    * Upload the data through the workspace
-    * Processing the data with PySpark notebooks using the medallion architecture.
-    * Save the data in the Unity Catalog as Delta tables.
-    * Create a data pipeline using databricks workflows.
+2. Delta + Unity Catalog
+   * Read and Write Tables
+   * Upload data to Unity Catalog
+   * Time Travel + Installing Libraries
+
+3 Medallion Architecture & Workflow Orchestration
+   * 3 Notebooks - Medallion architecture 
+   * Creating a Workflow Job
+
 
 # Setup Workspace
 Login to the [workspace](https://adb-3967117302852551.11.azuredatabricks.net/?o=3967117302852551) using the email address you used to sign-up for the SDS workshop
