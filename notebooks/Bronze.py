@@ -45,7 +45,7 @@ display(df_laptop_raw)
 
 spark.sql(
     f"""
-    CREATE SCHEMA IF NOT EXISTS {user_email}.bronze
+    CREATE SCHEMA IF NOT EXISTS {user_name}.bronze
     """
 )
 

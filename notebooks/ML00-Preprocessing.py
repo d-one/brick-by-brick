@@ -28,7 +28,13 @@ import re
 
 # COMMAND ----------
 
-catalog_name = "spyros_cavadias"
+# set up the below params
+user_email = "spyros.cavadias@ms.d-one.ai"
+user_name = "spyros_cavadias"
+
+# COMMAND ----------
+
+catalog_name = user_name
 schema_name = "bronze"
 table_name = "laptop_prices_euro"
 
@@ -142,8 +148,11 @@ features_sdf.printSchema()
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS spyros_cavadias.silver
+spark.sql(
+    f"""
+    CREATE SCHEMA IF NOT EXISTS {user_name}.silver
+    """
+)
 
 # COMMAND ----------
 
