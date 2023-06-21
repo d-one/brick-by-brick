@@ -162,21 +162,23 @@ print(df_v2.count())
 
 # COMMAND ----------
 
+user_email = "robert.yousif@ms.d-one.ai"
+path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
 # <TODO>
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ### 4. Write to your own table inside your own catalog and the default schema
-# MAGIC
-# MAGIC Display table to make sure that you have been writing to it, or look at the histroy of the table.
-# MAGIC ```py
-# MAGIC display(spark.table(<catalog>.<schema>.<table_name>))
-# MAGIC ```
 
 # COMMAND ----------
 
+catalog_name = "robert_yousif"
+table_name = "my_uploaded_laptop_price_table"
 # <TODO>
+
+
+display(spark.table(f"{catalog_name}.default.{table_name}"))
 
 # COMMAND ----------
 
@@ -210,20 +212,21 @@ print(df_v2.count())
 
 # COMMAND ----------
 
-path = "file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/laptop_price_euro.csv"
-dbutils.fs.ls("file:/Workspace/Repos/robert.yousif@ms.d-one.ai/sds-brick-by-brick/data/")
+# Make sure you have uploaded the file
+path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
+dbutils.fs.ls(path)
 
 # COMMAND ----------
 
 df = spark.read.format("csv").option("header", "true").load(path)
 display(df)
-df.write.format("delta").mode("append").saveAsTable("sds_catalog.default.laptop_price_euro")
+df.write.format("delta").mode("append").saveAsTable(f"{catalog_name}.default.{table_name}")
 #
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC DESCRIBE DETAIL sds_catalog.default.laptop_data
+# MAGIC DESCRIBE DETAIL robert_yousif.default.my_uploaded_laptop_price_table
 
 # COMMAND ----------
 
