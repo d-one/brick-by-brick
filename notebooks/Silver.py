@@ -1,14 +1,17 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Read a table from Unity Catalog
-# MAGIC Namespace
-# MAGIC * Catalog = sds_catalog
-# MAGIC * Schema = default
-# MAGIC * Table = laptop_prices
+# MAGIC
+# MAGIC In this notebook we will do some data cleaning.
 
 # COMMAND ----------
 
-df_bronze = spark.table("robert_yousif.bronze.laptop_prices")
+# set up the below params
+catalog_name = "robert_yousif"
+
+# COMMAND ----------
+
+df_bronze = spark.table(f"{catalog_name}.bronze.laptop_prices_euro")
 display(df_bronze)
 
 # COMMAND ----------
@@ -54,8 +57,7 @@ df_laptop_silver.printSchema()
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS robert_yousif.silver
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.silver")
 
 # COMMAND ----------
 
@@ -65,7 +67,6 @@ df_laptop_silver.printSchema()
 
 # COMMAND ----------
 
-catalog_name = "robert_yousif"
 schema_name = "silver"
 table_name = "laptop_prices"
 
@@ -96,14 +97,32 @@ dbutils.notebook.exit("End of notebook when running as a workflow task")
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC First lets create the a new table where we add `_testmerge` at the end of the table name
+
+# COMMAND ----------
+
+schema_name = "silver"
+table_name = "laptop_prices"
+
+df_laptop_silver.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}_testmerg")
+
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Lets change one of the column names
+
+# COMMAND ----------
+
 df_laptop_silver_mergeSchema = (
-    df_laptop_silver.withColumnRenamed("Weight", "Weight_Kg")
+    df_laptop_silver.withColumnRenamed("Weight_Kg", "Weight_Kgs")
 )
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC Without mergeSchema, you have to run this before the next command to get the error, why is that?
+# MAGIC Lets try to overwrite the table Without mergeSchema, you have to run this before the next command to get the error, why is that?
 
 # COMMAND ----------
 

@@ -1,20 +1,27 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Read a table from Unity Catalog
-# MAGIC Namespace
-# MAGIC * Catalog = sds_catalog
-# MAGIC * Schema = default
-# MAGIC * Table = laptop_prices
+# MAGIC In this notebook we will do some aggregations
 
 # COMMAND ----------
 
-df_silver = spark.table("robert_yousif.silver.laptop_prices")
+# set up the below params
+catalog_name = "robert_yousif"
+
+# COMMAND ----------
+
+df_silver = spark.table(f"{catalog_name}.silver.laptop_prices")
 display(df_silver)
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Make some aggregations 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC You can write it as pure SQL or embedded SQL. You can also do the aggregations using pure pyspark.
 
 # COMMAND ----------
 
@@ -33,20 +40,25 @@ display(df_silver)
 
 # COMMAND ----------
 
+
+
+# COMMAND ----------
+
 df_laptop_gold_1 = spark.sql(
-    """
+    f"""
     SELECT
         Company,
         count(Company) as num_of_laptops,
         AVG(Price_euros) as avg_price
     FROM
-        robert_yousif.silver.laptop_prices
+        {catalog_name}.silver.laptop_prices
     GROUP BY
         Company
     ORDER BY
         num_of_laptops DESC                   
     """
 )
+display(df_laptop_gold_1)
 
 # COMMAND ----------
 
@@ -61,8 +73,7 @@ df_laptop_gold_1 = spark.sql(
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS robert_yousif.gold
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.gold")
 
 # COMMAND ----------
 
@@ -72,7 +83,6 @@ df_laptop_gold_1 = spark.sql(
 
 # COMMAND ----------
 
-catalog_name = "robert_yousif"
 schema_name = "gold"
 table_name = "laptop_prices_1"
 
