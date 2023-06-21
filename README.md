@@ -16,7 +16,7 @@ Repository for the SDS databricks brick-by-brick workshop
    * Creating a Workflow Job
 
 
-# Setup Workspace
+# 1. Setup Workspace
 Login to the [workspace](https://adb-3967117302852551.11.azuredatabricks.net/?o=3967117302852551) using the email address you used to sign-up for the SDS workshop
 
 ## Adding the repository
@@ -35,13 +35,13 @@ Now you should see a repository named `sds-brick-by-brick` under your own direct
 3. Make sure the `Single user access` is under your name
 4. Click on `Create Cluster`
 
-# 3 Notebooks - the medallion architecture
+# 2. 3 Notebooks - the medallion architecture
 Go to the following notebooks and follow the instructions:
 1. `Bronze`. 
 2. `Silver` 
 3. `Gold`
 
-# Creating a Workflow Job
+# 3. Creating a Workflow Job
 1. Click on the `Workflows` tab in the navigation menu to the left.
 2. Click on the `Create job` button.
 3. Add a Job name for your Workflow at the top: `my_medallion_job_<firstname>_<lastname>`.
