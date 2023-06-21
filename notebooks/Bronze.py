@@ -17,7 +17,7 @@
 
 # set up the below params
 user_email = "robert.yousif@ms.d-one.ai"
-user_name = "robert_yousif"
+catalog_name = "robert_yousif"
 
 # COMMAND ----------
 
@@ -45,7 +45,7 @@ display(df_laptop_raw)
 
 spark.sql(
     f"""
-    CREATE SCHEMA IF NOT EXISTS {user_name}.bronze
+    CREATE SCHEMA IF NOT EXISTS {catalog_name}.bronze
     """
 )
 
@@ -68,9 +68,8 @@ spark.sql(
 
 # COMMAND ----------
 
-catalog_name = user_name
 schema_name = "bronze"
-table_name = "laptop_prices"
+table_name = "laptop_prices_euro"
 
 df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
@@ -140,11 +139,13 @@ dbutils.notebook.exit("End of notebook when running as a workflow task")
 
 # COMMAND ----------
 
-spark.sql(
+df_history = spark.sql(
     f"""
-    DESCRIBE HISTORY IF NOT EXISTS {catalog_name}.{schema_name}.{table_name}
+    DESCRIBE HISTORY {catalog_name}.{schema_name}.{table_name}
     """
 )
+
+display(df_history)
 
 # COMMAND ----------
 
