@@ -48,8 +48,8 @@ def score_model(model_uri, databricks_token, data):
 
 # COMMAND ----------
 
-MODEL_VERSION_URI = "https://adb-2332518824269154.14.azuredatabricks.net/serving-endpoints/sds_serving_demo/invocations"
-DATABRICKS_API_TOKEN = "dapi6b8f7a3d73651defcffbd3621e515d56-2"
+MODEL_VERSION_URI = None
+DATABRICKS_API_TOKEN = None
 
 # COMMAND ----------
 
