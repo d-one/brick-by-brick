@@ -386,7 +386,18 @@ client.transition_model_version_stage(
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC Exit notebook when running as a workflow task
+
+# COMMAND ----------
+
+dbutils.notebook.exit("End of notebook when running as a workflow task")
+
+# COMMAND ----------
+
 # MAGIC %md 
+# MAGIC
+# MAGIC ### Delete models
 # MAGIC
 # MAGIC Delete version 1.  
 # MAGIC
@@ -444,11 +455,3 @@ client.delete_registered_model(model_name)
 # MAGIC ## Topics & Resources on the MLflow Model Registry
 # MAGIC
 # MAGIC Check out <a href="https://mlflow.org/docs/latest/registry.html" target="_blank">the MLflow documentation</a>
-
-# COMMAND ----------
-
-# MAGIC %md-sandbox
-# MAGIC &copy; 2022 Databricks, Inc. All rights reserved.<br/>
-# MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the <a href="https://www.apache.org/">Apache Software Foundation</a>.<br/>
-# MAGIC <br/>
-# MAGIC <a href="https://databricks.com/privacy-policy">Privacy Policy</a> | <a href="https://databricks.com/terms-of-use">Terms of Use</a> | <a href="https://help.databricks.com/">Support</a>
