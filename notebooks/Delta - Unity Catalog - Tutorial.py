@@ -132,8 +132,6 @@ print(df_v2.count())
 # MAGIC 4. Write to your own table inside your own catalog and schema
 # MAGIC 5. See what other `DESCRIBE` commands you can run on your table to get more information
 # MAGIC 6. Share the table with the person sitting next to you. 
-# MAGIC
-# MAGIC You can read the full instructions here: [Delta Lake & Unity Catalog](https://diemobiliar.gitlab.io/it/had/tutorials/had-tutorials-training-iac/docs/adbx-dsw-labs/03-tutorials/delta-lake/)
 
 # COMMAND ----------
 
