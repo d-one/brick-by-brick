@@ -91,7 +91,7 @@ user_name = "spyros_cavadias"
 
 # COMMAND ----------
 
-catalog_name = user_email
+catalog_name = user_name
 schema_name = "silver"
 table_name = "features"
 
