@@ -21,8 +21,8 @@ Login to the [workspace](https://adb-3967117302852551.11.azuredatabricks.net/?o=
 
 ## Adding the repository
 Adding the repository to your workspace: 
-1. Click on `Repos` in the navigation menu to the left.
-2. Click on the directory with your email address.
+1. Click on `Workspace` in the navigation menu to the left.
+2. Click on the directory `Repos` and then on the directory with your email address (If it does not exist, create a new directory named like your email address).
 3. Click on `Add Repo` and paste this [URL](https://github.com/d-one/sds-brick-by-brick) into `Git repository` 
 4. Click on `Create Repo` 
 
