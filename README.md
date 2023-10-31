@@ -60,3 +60,15 @@ Go to the following notebooks and follow the instructions:
 Congratulations, you have now created a workflow Job.
 
 
+# 4. ML and MLOps
+
+1. Run the ML Preprocessing notebook in your catalog to create the feature table.
+2. Move on to the ML MLflow Tracking notebook and walk through the steps to understand how to interact with MLflow experiments inside the Databricks workspace.
+3. Move on to the ML Model Registry notebook and walk through the steps to understand how to interact with the model registry via python APIs or via the directly using the UI
+4. (Optional)Tie steps 1-3 together by creating a new ML workflow! See the results of the workflow run in the UI.
+5. (Optional)Finally move on to the AutoML notebook and see for yourself how easy it is to use databricks AutoML as a quick way to create baseline models.
+  
+
+Excellent, you have now mastered MLflow on Databricks and you are ready to apply these principals to your own project.
+
+
