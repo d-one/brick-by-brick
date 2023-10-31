@@ -1,5 +1,5 @@
-# sds-brick-by-brick
-Repository for the SDS databricks brick-by-brick workshop
+# brick-by-brick
+Repository for the D ONE databricks brick-by-brick workshop
 
 # Content
 1. Setup Workspace
