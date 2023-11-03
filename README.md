@@ -26,7 +26,7 @@ Adding the repository to your workspace:
 3. Click on `Add Repo` and paste this [URL](https://github.com/d-one/brick-by-brick) into `Git repository` 
 4. Click on `Create Repo` 
 
-Now you should see a repository named `sds-brick-by-brick` under your own directory.
+Now you should see a repository named `brick-by-brick` under your own directory.
 
 ## Create a personal cluster to your workspace.
 1. Click on the `Compute` tab in the navigation menu to the left.
