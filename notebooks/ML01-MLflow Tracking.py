@@ -99,7 +99,7 @@ X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Price_eur
 # COMMAND ----------
 
 # set experiment name 
-experiment = mlflow.set_experiment(f"/Users/{user_email}/sds_mlflow_experiment")
+experiment = mlflow.set_experiment(f"/Users/{user_email}/gtc_mlflow_experiment")
 
 # COMMAND ----------
 

@@ -7,7 +7,7 @@
 # COMMAND ----------
 
 # set up the below params
-catalog_name = "robert_yousif"
+catalog_name = "spyros_cavadias"
 
 # COMMAND ----------
 
@@ -28,7 +28,7 @@ df_bronze.printSchema()
 from pyspark.sql.functions import expr
 from pyspark.sql.types import StringType, DateType, FloatType, IntegerType
 
-df_laptop_bronze = spark.table("robert_yousif.bronze.laptop_prices")
+df_laptop_bronze = spark.table(f"{catalog_name}.bronze.laptop_prices_euro")
 
 df_laptop_silver = (
     df_bronze.withColumn("Inches", df_bronze["Inches"].cast(FloatType()))
