@@ -16,12 +16,12 @@
 # COMMAND ----------
 
 # set up the below params
-user_email = "robert.yousif@ms.d-one.ai"
-catalog_name = "robert_yousif"
+user_email = "spyros.cavadias@ms.d-one.ai"
+catalog_name = "spyros_cavadias
 
 # COMMAND ----------
 
-path = f"file:/Workspace/Repos/{user_email}/sds-brick-by-brick/data/laptop_price_euro.csv"
+path = f"file:/Workspace/Repos/{user_email}/brick-by-brick/data/laptop_price_euro.csv"
 
 dbutils.fs.ls(path)
 
@@ -40,6 +40,14 @@ except:
 # COMMAND ----------
 
 display(df_laptop_raw)
+
+# COMMAND ----------
+
+spark.sql(
+    f"""
+    CREATE CATALOG IF NOT EXISTS {catalog_name}
+    """
+)
 
 # COMMAND ----------
 
