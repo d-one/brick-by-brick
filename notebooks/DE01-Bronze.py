@@ -1,7 +1,7 @@
 # Databricks notebook source
 # MAGIC %md 
 # MAGIC # Reading the data 
-# MAGIC In this tutorial you can use the Repos to read the data, as the data is part of the repository [sds-brick-by-brick](https://github.com/d-one/sds-brick-by-brick).
+# MAGIC In this tutorial you can use the Repos to read the data, as the data is part of the repository [brick-by-brick](https://github.com/d-one/brick-by-brick).
 # MAGIC
 # MAGIC Please change the name inside the `path` to your own.
 # MAGIC The dataset is called `laptop_data.csv`.
