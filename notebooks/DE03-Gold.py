@@ -6,7 +6,7 @@
 # COMMAND ----------
 
 # set up the below params
-catalog_name = "robert_yousif"
+catalog_name = "" #<firstname_lastname>
 
 # COMMAND ----------
 

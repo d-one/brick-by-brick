@@ -7,7 +7,7 @@
 # COMMAND ----------
 
 # set up the below params
-catalog_name = "spyros_cavadias"
+catalog_name = "" #<firstname_lastname>
 
 # COMMAND ----------
 

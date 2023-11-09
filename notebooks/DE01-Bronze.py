@@ -16,8 +16,8 @@
 # COMMAND ----------
 
 # set up the below params
-user_email = "spyros.cavadias@ms.d-one.ai"
-catalog_name = "spyros_cavadias
+user_email = "" #<firstname.lastname@emailprovider.xx>
+catalog_name = "" #<firstname_lastname>
 
 # COMMAND ----------
 
