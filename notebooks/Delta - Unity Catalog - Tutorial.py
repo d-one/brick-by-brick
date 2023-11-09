@@ -8,7 +8,7 @@
 
 # COMMAND ----------
 
-df = spark.table("sds_catalog.default.laptop_price_euro")
+df = spark.table("gtc_catalog.default.laptop_prices_euro")
 display(df)
 
 # COMMAND ----------
@@ -20,7 +20,7 @@ display(df)
 
 # MAGIC %sql
 # MAGIC
-# MAGIC SELECT * FROM sds_catalog.default.laptop_price_euro
+# MAGIC SELECT * FROM gtc_catalog.default.laptop_prices_euro
 
 # COMMAND ----------
 
@@ -29,7 +29,7 @@ display(df)
 
 # COMMAND ----------
 
-df = spark.sql("SELECT * FROM sds_catalog.default.laptop_price_euro")
+df = spark.sql("SELECT * FROM gtc_catalog.default.laptop_prices_euro")
 
 # COMMAND ----------
 
@@ -41,7 +41,7 @@ df = spark.sql("SELECT * FROM sds_catalog.default.laptop_price_euro")
 # MAGIC %sql
 # MAGIC CREATE OR REPLACE TEMPORARY VIEW temptable_sql_laptop_data
 # MAGIC AS
-# MAGIC SELECT * FROM sds_catalog.default.laptop_price_euro
+# MAGIC SELECT * FROM gtc_catalog.default.laptop_prices_euro
 
 # COMMAND ----------
 
@@ -60,7 +60,7 @@ display(df)
 
 # COMMAND ----------
 
-df = spark.table("sds_catalog.default.laptop_price_euro")
+df = spark.table("gtc_catalog.default.laptop_prices_euro")
 df.createOrReplaceTempView("temptable_python_laptop_data")
 
 
@@ -81,21 +81,21 @@ df.createOrReplaceTempView("temptable_python_laptop_data")
 # COMMAND ----------
 
 
-df = spark.table("sds_catalog.default.laptop_price_euro")
-df.write.format("delta").mode("append").saveAsTable("sds_catalog.default.laptop_price_euro")
+df = spark.table("gtc_catalog.default.laptop_prices_euro")
+df.write.format("delta").mode("append").saveAsTable("gtc_catalog.default.laptop_prices_euro")
 
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC DESCRIBE HISTORY sds_catalog.default.laptop_price_euro
+# MAGIC DESCRIBE HISTORY gtc_catalog.default.laptop_prices_euro
 
 # COMMAND ----------
 
-df_v1 = spark.table("sds_catalog.default.laptop_price_euro@v0")
+df_v1 = spark.table("gtc_catalog.default.laptop_prices_euro@v0")
 print(df_v1.count())
 
-df_v2 = spark.table("sds_catalog.default.laptop_price_euro@v1")
+df_v2 = spark.table("gtc_catalog.default.laptop_prices_euro@v1")
 print(df_v2.count())
 
 # COMMAND ----------
@@ -106,7 +106,7 @@ print(df_v2.count())
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT count(*) FROM sds_catalog.default.laptop_price_euro VERSION AS OF 0
+# MAGIC SELECT count(*) FROM gtc_catalog.default.laptop_prices_euro VERSION AS OF 0
 
 # COMMAND ----------
 
@@ -162,7 +162,7 @@ print(df_v2.count())
 
 # COMMAND ----------
 
-user_email = "robert.yousif@ms.d-one.ai"
+user_email = "spyros.cavadias@ms.d-one.ai"
 path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
 # <TODO>
 
@@ -173,7 +173,7 @@ path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
 
 # COMMAND ----------
 
-catalog_name = "robert_yousif"
+catalog_name = "spyros.cavadias@ms.d-one.ai"
 table_name = "my_uploaded_laptop_price_table"
 # <TODO>
 
