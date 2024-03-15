@@ -2,25 +2,54 @@
 # MAGIC %md
 # MAGIC # Read a table from Unity Catalog
 # MAGIC Namespace
-# MAGIC * Catalog = sds_catalog
+# MAGIC * Catalog = user_catalog
 # MAGIC * Schema = default
-# MAGIC * Table = laptop_data
+# MAGIC * Table = laptop_prices_euro
 
 # COMMAND ----------
 
-df = spark.table("gtc_catalog.default.laptop_prices_euro")
+user_email = spark.sql('select current_user() as user').collect()[0]['user']
+catalog_name = user_email.split('@')[0].replace(".", "_")
+
+# COMMAND ----------
+
+# create user catalog if not exists
+spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog_name}")
+
+# use the user catalog
+spark.sql(f"USE CATALOG {catalog_name}")
+
+# COMMAND ----------
+
+# clone data from workshop catalog to your user catalog
+workshop_catalog = "gtc_catalog"
+spark.sql(f"CREATE TABLE IF NOT EXISTS {catalog_name}.default.laptop_prices_euro SHALLOW CLONE {workshop_catalog}.default.laptop_prices_euro")
+
+# COMMAND ----------
+
+df = spark.table(f"{catalog_name}.default.laptop_prices_euro")
 display(df)
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC Using SQL
+# MAGIC
+# MAGIC IMPORTANT: you have to pass the catalog name, as f-strings don't work with sql queries
+
+# COMMAND ----------
+
+# your catalog name
+catalog_name
 
 # COMMAND ----------
 
 # MAGIC %sql
+# MAGIC -- you have to pass the catalog name, as f-strings don't work with sql queries
+# MAGIC -- add it without the string ('') markers
 # MAGIC
-# MAGIC SELECT * FROM gtc_catalog.default.laptop_prices_euro
+# MAGIC -- SELECT * FROM user_catalog.default.laptop_prices_euro
+# MAGIC SELECT * FROM spyros_cavadias.default.laptop_prices_euro
 
 # COMMAND ----------
 
@@ -29,7 +58,8 @@ display(df)
 
 # COMMAND ----------
 
-df = spark.sql("SELECT * FROM gtc_catalog.default.laptop_prices_euro")
+df = spark.sql(f"SELECT * FROM {catalog_name}.default.laptop_prices_euro")
+df.display()
 
 # COMMAND ----------
 
@@ -39,9 +69,11 @@ df = spark.sql("SELECT * FROM gtc_catalog.default.laptop_prices_euro")
 # COMMAND ----------
 
 # MAGIC %sql
+# MAGIC -- you have to pass the catalog name, as f-strings don't work with sql queries
+# MAGIC -- add it without the string ('') markers
 # MAGIC CREATE OR REPLACE TEMPORARY VIEW temptable_sql_laptop_data
 # MAGIC AS
-# MAGIC SELECT * FROM gtc_catalog.default.laptop_prices_euro
+# MAGIC SELECT * FROM spyros_cavadias.default.laptop_prices_euro
 
 # COMMAND ----------
 
@@ -60,13 +92,15 @@ display(df)
 
 # COMMAND ----------
 
-df = spark.table("gtc_catalog.default.laptop_prices_euro")
+df = spark.table(f"{catalog_name}.default.laptop_prices_euro")
 df.createOrReplaceTempView("temptable_python_laptop_data")
+display(spark.table("temptable_sql_laptop_data"))
 
 
 # COMMAND ----------
 
-# test with new column and append
+# MAGIC %md
+# MAGIC Show all created views
 
 # COMMAND ----------
 
@@ -81,22 +115,38 @@ df.createOrReplaceTempView("temptable_python_laptop_data")
 # COMMAND ----------
 
 
-df = spark.table("gtc_catalog.default.laptop_prices_euro")
-df.write.format("delta").mode("append").saveAsTable("gtc_catalog.default.laptop_prices_euro")
+import pyspark.sql.functions as f
+
+df = spark.table(f"{catalog_name}.default.laptop_prices_euro")
+df.write.format("delta").mode("append").saveAsTable(f"{catalog_name}.default.laptop_prices_euro") # append new rows to existing dataframe
+
+# add a new column and append
+(
+    df
+    .withColumn("Price_euros_2", f.col("Price_euros"))
+    .write
+    .format("delta")
+    .mode("append")
+    .option("mergeSchema", "true") # option to merge schemas for new columns
+    .saveAsTable(f"{catalog_name}.default.laptop_prices_euro")
+)
 
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC DESCRIBE HISTORY gtc_catalog.default.laptop_prices_euro
+spark.sql(f"DESCRIBE HISTORY {catalog_name}.default.laptop_prices_euro").display()
 
 # COMMAND ----------
 
-df_v1 = spark.table("gtc_catalog.default.laptop_prices_euro@v0")
-print(df_v1.count())
+df_v0 = spark.table(f"{catalog_name}.default.laptop_prices_euro@v0")
+print(df_v0.count(), len(df_v0.columns))
 
-df_v2 = spark.table("gtc_catalog.default.laptop_prices_euro@v1")
-print(df_v2.count())
+df_v1 = spark.table(f"{catalog_name}.default.laptop_prices_euro@v1")
+print(df_v1.count(), len(df_v1.columns))
+
+df_v2 = spark.table(f"{catalog_name}.default.laptop_prices_euro@v2")
+print(df_v2.count(), len(df_v2.columns))
+
 
 # COMMAND ----------
 
@@ -106,7 +156,7 @@ print(df_v2.count())
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT count(*) FROM gtc_catalog.default.laptop_prices_euro VERSION AS OF 0
+# MAGIC SELECT count(*) FROM spyros_cavadias.default.laptop_prices_euro VERSION AS OF 0
 
 # COMMAND ----------
 
@@ -126,7 +176,7 @@ print(df_v2.count())
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 1. Download the data from the repository: [laptop_data](https://github.com/d-one/sds-brick-by-brick/tree/main/data)
+# MAGIC 1. Download the data from the repository: [laptop_price_euro](https://github.com/d-one/brick-by-brick/blob/main/data/laptop_price_euro.csv)
 # MAGIC 2. Upload the data as a workspace object to your personal directory.
 # MAGIC 3. Read the data and display it
 # MAGIC 4. Write to your own table inside your own catalog and schema
@@ -137,7 +187,7 @@ print(df_v2.count())
 
 # MAGIC %md
 # MAGIC ### 1. Download the data from the repository
-# MAGIC Click on this [link](https://github.com/d-one/sds-brick-by-brick/blob/main/data/laptop_data.csv) and download the data directly from github to your local machine. (You will find a `Download Raw File` Button at the top right of the document preview inside gitlab.)
+# MAGIC Click on this [link](https://github.com/d-one/brick-by-brick/blob/main/data/laptop_price_euro.csv) and download the data directly from github to your local machine. (You will find a `Download Raw File` Button at the top right of the document preview inside gitlab.)
 
 # COMMAND ----------
 
@@ -149,7 +199,7 @@ print(df_v2.count())
 # MAGIC     * `Workspace`: Shared and Users directories.
 # MAGIC     * `Repos`: All repositories.
 # MAGIC
-# MAGIC 2. Click on the `Workspace` -> `Users` and choose your name, if your name does not exist, create a directory with your name `firstname_lastname`. 
+# MAGIC 2. Click on the `Workspace` -> `Users` and choose your name, if your name does not exist, create a directory with the email adress you are logged in (see top right of workspace). 
 # MAGIC 3. Right click inside your directory and click on `Import`, this will open a new window with the name `Import`
 # MAGIC 4. Choose File and either drop a file or browse for it. 
 # MAGIC 5. Click on the `Import` button
@@ -157,12 +207,11 @@ print(df_v2.count())
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ### 3. Read the data and display it
-# MAGIC TIP: Use the path `"file:/Workspace/Users/<firstname>_<lastname>/<path-to-file>"`
+# MAGIC ### 3. Read the data, display it and display the path where it resides
+# MAGIC TIP: Use the path `"file:/Workspace/Users/<user_email>/<path-to-file>"`
 
 # COMMAND ----------
 
-user_email = "spyros.cavadias@ms.d-one.ai"
 path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
 # <TODO>
 
@@ -173,12 +222,8 @@ path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
 
 # COMMAND ----------
 
-catalog_name = "spyros.cavadias@ms.d-one.ai"
 table_name = "my_uploaded_laptop_price_table"
 # <TODO>
-
-
-display(spark.table(f"{catalog_name}.default.{table_name}"))
 
 # COMMAND ----------
 
@@ -191,7 +236,6 @@ display(spark.table(f"{catalog_name}.default.{table_name}"))
 
 # MAGIC %sql
 # MAGIC -- <TODO>
-# MAGIC GRANT SELECT on CATALOG 
 
 # COMMAND ----------
 
@@ -204,6 +248,7 @@ display(spark.table(f"{catalog_name}.default.{table_name}"))
 
 # MAGIC %sql
 # MAGIC -- Either do it here or in the GUI
+# MAGIC -- <TODO>
 
 # COMMAND ----------
 
@@ -212,21 +257,40 @@ display(spark.table(f"{catalog_name}.default.{table_name}"))
 
 # COMMAND ----------
 
-# Make sure you have uploaded the file
-path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
-dbutils.fs.ls(path)
+# 3.
+# # Make sure you have uploaded the file
+# path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
+# dbutils.fs.ls(path)
+# df = spark.read.format("csv").option("header", True).load(path)
+# display(df)
 
 # COMMAND ----------
 
-df = spark.read.format("csv").option("header", "true").load(path)
-display(df)
-df.write.format("delta").mode("append").saveAsTable(f"{catalog_name}.default.{table_name}")
-#
+# 4.
+# table_name = "my_uploaded_laptop_price_table"
+# df.write.format("delta").saveAsTable(f"{catalog_name}.default.{table_name}")
+# display(spark.table(f"{catalog_name}.default.{table_name}"))
+
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC DESCRIBE DETAIL robert_yousif.default.my_uploaded_laptop_price_table
+# MAGIC -- 4.
+# MAGIC -- DESCRIBE table EXTENDED spyros_cavadias.default.my_uploaded_laptop_price_table
+# MAGIC -- DESCRIBE DETAIL spyros_cavadias.default.my_uploaded_laptop_price_table
+# MAGIC -- DESCRIBE HISTORY spyros_cavadias.default.my_uploaded_laptop_price_table
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- 5.
+# MAGIC -- GRANT SELECT on TABLE spyros_cavadias.default.my_uploaded_laptop_price_table TO robert.yousif@d-one.ai
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- 6.
+# MAGIC -- GRANT SELECT on TABLE spyros_cavadias.default.my_uploaded_laptop_price_table TO robert.yousif@d-one.ai
 
 # COMMAND ----------
 
