@@ -85,13 +85,12 @@ from sklearn.model_selection import train_test_split
 
 # COMMAND ----------
 
-# set up the below params
-user_email = "spyros.cavadias@ms.d-one.ai"
-user_name = "spyros_cavadias"
+# user parameters
+user_email = spark.sql('select current_user() as user').collect()[0]['user']
+catalog_name = user_email.split('@')[0].replace(".", "_")
 
 # COMMAND ----------
 
-catalog_name = user_name
 schema_name = "silver"
 table_name = "features"
 
@@ -112,7 +111,7 @@ X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Price_eur
 # COMMAND ----------
 
 # set experiment name 
-experiment = mlflow.set_experiment(f"/Users/{user_email}/gtc_mlflow_experiment")
+experiment = mlflow.set_experiment(f"/Users/{user_email}/amld_mlflow_experiment")
 
 # COMMAND ----------
 
