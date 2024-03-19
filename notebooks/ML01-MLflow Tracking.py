@@ -72,13 +72,12 @@ from math import sqrt, log, exp
 
 # COMMAND ----------
 
-# set up the below params
-user_email = "spyros.cavadias@ms.d-one.ai"
-user_name = "spyros_cavadias"
+# user parameters
+user_email = spark.sql('select current_user() as user').collect()[0]['user']
+catalog_name = user_email.split('@')[0].replace(".", "_")
 
 # COMMAND ----------
 
-catalog_name = user_name
 schema_name = "silver"
 table_name = "features"
 
@@ -99,7 +98,7 @@ X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Price_eur
 # COMMAND ----------
 
 # set experiment name 
-experiment = mlflow.set_experiment(f"/Users/{user_email}/gtc_mlflow_experiment")
+experiment = mlflow.set_experiment(f"/Users/{user_email}/amld_mlflow_experiment")
 
 # COMMAND ----------
 
@@ -128,8 +127,6 @@ with mlflow.start_run(run_name="LR-Numerical-Features") as run:
 # MAGIC %md 
 # MAGIC
 # MAGIC There, all done! Let's go through the other two linear regression models and then compare our runs. 
-# MAGIC
-# MAGIC **Question**: Does anyone remember the RMSE of the other runs?
 # MAGIC
 # MAGIC Next let's build our linear regression model but use all of our features.
 
