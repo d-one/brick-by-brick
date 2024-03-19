@@ -28,15 +28,25 @@ import re
 
 # COMMAND ----------
 
-# set up the below params
-user_email = "spyros.cavadias@ms.d-one.ai"
-user_name = "spyros_cavadias"
+# user parameters
+user_email = spark.sql('select current_user() as user').collect()[0]['user']
+catalog_name = user_email.split('@')[0].replace(".", "_")
+workshop_catalog_name = "amld_catalog"
 
 # COMMAND ----------
 
-catalog_name = user_name
 schema_name = "bronze"
 table_name = "laptop_prices_euro"
+
+# create catalog if not exists
+spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog_name}")
+
+# create schema if not exists
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.{schema_name}") 
+
+# if bronze table not available, clone it from workshop catalog
+if table_name not in spark.sql(f"SHOW TABLES IN {catalog_name}.{schema_name}").toPandas()['tableName'].tolist():
+    spark.sql(f"CREATE TABLE IF NOT EXISTS {catalog_name}.{schema_name}.{table_name} SHALLOW CLONE {workshop_catalog_name}.{schema_name}.{table_name}") 
 
 sdf_raw = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}")
 
@@ -148,16 +158,14 @@ features_sdf.printSchema()
 
 # COMMAND ----------
 
-spark.sql(
-    f"""
-    CREATE SCHEMA IF NOT EXISTS {user_name}.silver
-    """
-)
-
-# COMMAND ----------
-
 target_schema_name = "silver"
 target_table_name = "features"
+
+spark.sql(
+    f"""
+    CREATE SCHEMA IF NOT EXISTS {catalog_name}.{target_schema_name}
+    """
+)
 
 features_sdf.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{target_schema_name}.{target_table_name}")
 
