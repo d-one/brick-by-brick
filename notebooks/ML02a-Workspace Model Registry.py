@@ -79,8 +79,9 @@ import mlflow.sklearn
 from mlflow.models.signature import infer_signature
 
 import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 
 # COMMAND ----------
@@ -100,24 +101,25 @@ df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # one-hot encode categorical columns 
 #categorical data
-categorical_cols = ['Company', 'TypeName', 'operating_system','memory_type','cpu_manufacturer','gpu_manufacturer']
+categorical_cols = ['Geography', 'Gender', ]
 # get_dummies
-enriched_df = pd.get_dummies(df, columns = categorical_cols)
+enriched_df = pd.get_dummies(df, columns = categorical_cols).astype(np.float64)
+
 
 # train test split 
-X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Price_euros"], axis=1), enriched_df[["Price_euros"]].values.ravel(), test_size=0.1, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Exited"], axis=1), enriched_df[["Exited"]].values.ravel(), test_size=0.1, random_state=42)
 
 
 # COMMAND ----------
 
 # set experiment name 
-experiment = mlflow.set_experiment(f"/Users/{user_email}/amld_mlflow_experiment")
+experiment = mlflow.set_experiment(f"/Users/{user_email}/opap_mlflow_experiment")
 
 # COMMAND ----------
 
 with mlflow.start_run(run_name="LR Model Autolog") as run:
     mlflow.sklearn.autolog(log_input_examples=False, log_model_signatures=True, log_models=True)
-    lr = LinearRegression()
+    lr = LogisticRegression()
     lr.fit(X_train, y_train)
     signature = infer_signature(X_train, lr.predict(X_train))
 
@@ -192,7 +194,7 @@ model_version_details.status
 
 client.update_registered_model(
     name=model_details.name,
-    description="This model forecasts laptop prices based on various handcrafted features."
+    description="This model forecasts customers' excitement based on various features."
 )
 
 # COMMAND ----------
@@ -206,7 +208,7 @@ client.update_registered_model(
 client.update_model_version(
     name=model_details.name,
     version=model_details.version,
-    description="This model version was built using OLS linear regression with sklearn."
+    description="This model version was built using logistic regression with sklearn."
 )
 
 # COMMAND ----------
@@ -296,25 +298,25 @@ model_version_1.predict(X_test)
 
 # COMMAND ----------
 
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import RidgeClassifier
 
 with mlflow.start_run(run_name="LR Ridge Model") as run:
     alpha = .9
-    ridge_regression = Ridge(alpha=alpha)
-    ridge_regression.fit(X_train, y_train)
+    ridge_classifier = RidgeClassifier(alpha=alpha)
+    ridge_classifier.fit(X_train, y_train)
 
     # Specify the `registered_model_name` parameter of the `mlflow.sklearn.log_model()`
     # function to register the model with the MLflow Model Registry. This automatically
     # creates a new model version
 
     mlflow.sklearn.log_model(
-        sk_model=ridge_regression,
+        sk_model=ridge_classifier,
         artifact_path="sklearn-ridge-model",
         registered_model_name=model_name,
     )
 
-    mlflow.log_params(ridge_regression.get_params())
-    mlflow.log_metric("mse", mean_squared_error(y_test, ridge_regression.predict(X_test)))
+    mlflow.log_params(ridge_classifier.get_params())
+    mlflow.log_metric("f1_score_ridge", f1_score(y_test, ridge_classifier.predict(X_test)))
 
 # COMMAND ----------
 
@@ -365,7 +367,7 @@ new_model_version = max([model_version_info.version for model_version_info in mo
 client.update_model_version(
     name=model_name,
     version=new_model_version,
-    description=f"This model version is a ridge regression model with an alpha value of {alpha} that was trained in scikit-learn."
+    description=f"This model version is a ridge classification model with an alpha value of {alpha} that was trained in scikit-learn."
 )
 
 # COMMAND ----------

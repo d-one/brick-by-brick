@@ -10,8 +10,8 @@ catalog_name = "" #<firstname_lastname>
 
 # COMMAND ----------
 
-df_silver = spark.table(f"{catalog_name}.silver.laptop_prices")
-display(df_silver)
+df_silver = spark.table(f"{catalog_name}.silver.churn_modelling")
+display(df_silver.limit(5))
 
 # COMMAND ----------
 
@@ -27,38 +27,34 @@ display(df_silver)
 
 # MAGIC %sql
 # MAGIC SELECT
-# MAGIC   Company,
-# MAGIC   count(Company) as num_of_laptops,
-# MAGIC   AVG(Price_euros) as avg_price,
-# MAGIC   AVG(Weight_kg/Inches) as weight_per_inch
+# MAGIC   Geography,
+# MAGIC   count(CustomerId) as num_customers,
+# MAGIC   AVG(Balance) as avg_balance,
+# MAGIC   AVG(Age) as avg_age
 # MAGIC FROM
-# MAGIC   robert_yousif.silver.laptop_prices
+# MAGIC   panagiotis_goumenakis.silver.churn_modelling
 # MAGIC GROUP BY
-# MAGIC   Company
+# MAGIC   Geography
 # MAGIC ORDER BY
-# MAGIC   num_of_laptops DESC
+# MAGIC   num_customers DESC
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
-df_laptop_gold_1 = spark.sql(
+df_churn_gold_1 = spark.sql(
     f"""
     SELECT
-        Company,
-        count(Company) as num_of_laptops,
-        AVG(Price_euros) as avg_price
+        Geography,
+        count(CustomerId) as num_customers,
+        AVG(Balance) as avg_balance
     FROM
-        {catalog_name}.silver.laptop_prices
+        {catalog_name}.silver.churn_modelling
     GROUP BY
-        Company
+        Geography
     ORDER BY
-        num_of_laptops DESC                   
+        num_customers DESC                   
     """
 )
-display(df_laptop_gold_1)
+display(df_churn_gold_1)
 
 # COMMAND ----------
 
@@ -84,9 +80,9 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.gold")
 # COMMAND ----------
 
 schema_name = "gold"
-table_name = "laptop_prices_1"
+table_name = "churn_modelling_1"
 
-df_laptop_gold_1.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+df_churn_gold_1.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
 
 # COMMAND ----------

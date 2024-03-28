@@ -21,7 +21,7 @@ catalog_name = "" #<firstname_lastname>
 
 # COMMAND ----------
 
-path = f"file:/Workspace/Repos/{user_email}/brick-by-brick/data/laptop_price_euro.csv"
+path = f"file:/Workspace/Repos/{user_email}/brick-by-brick/data/churn_modelling.csv"
 
 dbutils.fs.ls(path)
 
@@ -33,13 +33,13 @@ dbutils.fs.ls(path)
 # COMMAND ----------
 
 try:
-    df_laptop_raw = spark.read.format("csv").option("header", "true").load(path)
+    df_churn_raw = spark.read.format("csv").option("header", "true").load(path)
 except:
     print("File does not exist, please make sure that your path is correct and that you have pulled the repository to databricks repos")
 
 # COMMAND ----------
 
-display(df_laptop_raw)
+df_churn_raw.display()
 
 # COMMAND ----------
 
@@ -77,9 +77,9 @@ spark.sql(
 # COMMAND ----------
 
 schema_name = "bronze"
-table_name = "laptop_prices_euro"
+table_name = "churn_modelling"
 
-df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+df_churn_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
 
 # COMMAND ----------
@@ -102,8 +102,8 @@ df_laptop_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_nam
 
 # COMMAND ----------
 
-df_laptop_bronze = spark.table(f"{catalog_name}.{schema_name}.{table_name}")
-display(df_laptop_bronze)
+df_churn_bronze = spark.table(f"{catalog_name}.{schema_name}.{table_name}")
+display(df_churn_bronze)
 
 # COMMAND ----------
 
@@ -128,8 +128,8 @@ dbutils.notebook.exit("End of notebook when running as a workflow task")
 
 # MAGIC %md 
 # MAGIC ## Exercise
-# MAGIC * Create a new table called `laptop_prices_dev`
-# MAGIC * Write the `df_laptop` to the table `laptop_prices_dev` using both `append` and `overwrite` to create some history.
+# MAGIC * Create a new table called `churn_modelling_dev`
+# MAGIC * Write the `df_churn` to the table `churn_modelling_dev` using both `append` and `overwrite` to create some history.
 # MAGIC * Check the table history columns `operation`& `operationMetrics`
 
 # COMMAND ----------
@@ -143,7 +143,7 @@ dbutils.notebook.exit("End of notebook when running as a workflow task")
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC Check the delta table history of your `laptop_prices_dev`
+# MAGIC Check the delta table history of your `churn_modelling_dev`
 
 # COMMAND ----------
 

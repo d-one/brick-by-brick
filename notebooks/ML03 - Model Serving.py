@@ -48,59 +48,31 @@ def score_model(model_uri, databricks_token, data):
 
 # COMMAND ----------
 
-MODEL_VERSION_URI = "https://adb-1451829595406012.12.azuredatabricks.net/serving-endpoints/gtc_serving_demo/invocations"
-DATABRICKS_API_TOKEN = "dapid1219f351614dbdf9b833fb15769bb76-2"
+MODEL_VERSION_URI = "https://adb-1451829595406012.12.azuredatabricks.net/serving-endpoints/opap_serving_demo/invocations"
+DATABRICKS_API_TOKEN = ""
 
 # COMMAND ----------
 
 # data sample to send to the model endpoint
 data =  pd.DataFrame([{
-    'screen_size_norm': 15,	
-    'total_pixels': 2073600,
-    'ram_size': 32,
-    'weight_kg': 5,
-    'memory_size': 500,
-    'cpu_clock_spead': 4,
-    'Company_Acer': 0,
-    'Company_Apple':  0,
-    'Company_Asus': 0,
-    'Company_Chuwi':  0,
-    'Company_Dell': 1,
-    'Company_Fujitsu':  0,
-    'Company_Google': 0,
-    'Company_HP': 0,
-    'Company_Huawei': 0,
-    'Company_LG': 0,
-    'Company_Lenovo':  0,
-    'Company_MSI': 0,
-    'Company_Mediacom': 0,
-    'Company_Microsoft': 0,
-    'Company_Razer': 0,
-    'Company_Samsung': 0,
-    'Company_Toshiba':  0,
-    'Company_Vero': 0,
-    'Company_Xiaomi': 0,
-    'TypeName_2 in 1 Convertible': 0,
-    'TypeName_Gaming': 0,
-    'TypeName_Netbook': 0,
-    'TypeName_Notebook':  0,
-    'TypeName_Ultrabook': 1,
-    'TypeName_Workstation':  0,
-    'operating_system_linux':  0,
-    'operating_system_mac': 0,
-    'operating_system_no os':  0,
-    'operating_system_other': 0,
-    'operating_system_windows': 1,
-    'memory_type_hdd': 0,
-    'memory_type_hybrid':  0,
-    'memory_type_ssd': 1,
-    'cpu_manufacturer_amd':  0,
-    'cpu_manufacturer_intel': 1,
-    'cpu_manufacturer_other':  0,
-    'gpu_manufacturer_amd':  0,
-    'gpu_manufacturer_intel': 1,
-    'gpu_manufacturer_nvidia': 0,
-    'gpu_manufacturer_other': 0
+    'Balance': 114753.76,
+    'EstimatedSalary': 107665.02,
+    'CreditScore': 691.0,
+    'Age': 38.0,
+    'Tenure': 5.0,
+    'NumOfProducts': 1.0,
+    'HasCrCard': 1.0,
+    'IsActiveMember': 0.0,
+    'Exited': 0.0,
+    'IsActive_by_CreditCard': 0.0,
+    'Products_Per_Tenure': 5.0,
+    'ZeroBalance': 0.0,
+    'AgeCat': 2.0,
+    'Geography_France': 0.0,
+    'Geography_Germany': 1.0,
+    'Geography_Spain': 0.0,
+    'Gender_Female': 1.0,
+    'Gender_Male': 0.0,
 }])
 
 # COMMAND ----------

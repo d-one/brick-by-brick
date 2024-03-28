@@ -4,7 +4,7 @@
 # MAGIC Namespace
 # MAGIC * Catalog = user_catalog
 # MAGIC * Schema = default
-# MAGIC * Table = laptop_prices_euro
+# MAGIC * Table = churn_modelling
 
 # COMMAND ----------
 
@@ -22,12 +22,12 @@ spark.sql(f"USE CATALOG {catalog_name}")
 # COMMAND ----------
 
 # clone data from workshop catalog to your user catalog
-workshop_catalog = "gtc_catalog"
-spark.sql(f"CREATE TABLE IF NOT EXISTS {catalog_name}.default.laptop_prices_euro SHALLOW CLONE {workshop_catalog}.default.laptop_prices_euro")
+workshop_catalog = "opap_catalog"
+spark.sql(f"CREATE TABLE IF NOT EXISTS {catalog_name}.default.churn_modelling SHALLOW CLONE {workshop_catalog}.default.churn_modelling")
 
 # COMMAND ----------
 
-df = spark.table(f"{catalog_name}.default.laptop_prices_euro")
+df = spark.table(f"{catalog_name}.default.churn_modelling")
 display(df)
 
 # COMMAND ----------
@@ -48,8 +48,8 @@ catalog_name
 # MAGIC -- you have to pass the catalog name, as f-strings don't work with sql queries
 # MAGIC -- add it without the string ('') markers
 # MAGIC
-# MAGIC -- SELECT * FROM user_catalog.default.laptop_prices_euro
-# MAGIC SELECT * FROM spyros_cavadias.default.laptop_prices_euro
+# MAGIC -- SELECT * FROM user_catalog.default.churn_modelling
+# MAGIC SELECT * FROM panagiotis_goumenakis.default.churn_modelling
 
 # COMMAND ----------
 
@@ -58,7 +58,7 @@ catalog_name
 
 # COMMAND ----------
 
-df = spark.sql(f"SELECT * FROM {catalog_name}.default.laptop_prices_euro")
+df = spark.sql(f"SELECT * FROM {catalog_name}.default.churn_modelling")
 df.display()
 
 # COMMAND ----------
@@ -71,18 +71,18 @@ df.display()
 # MAGIC %sql
 # MAGIC -- you have to pass the catalog name, as f-strings don't work with sql queries
 # MAGIC -- add it without the string ('') markers
-# MAGIC CREATE OR REPLACE TEMPORARY VIEW temptable_sql_laptop_data
+# MAGIC CREATE OR REPLACE TEMPORARY VIEW temptable_sql_churn_modelling
 # MAGIC AS
-# MAGIC SELECT * FROM spyros_cavadias.default.laptop_prices_euro
+# MAGIC SELECT * FROM panagiotis_goumenakis.default.churn_modelling
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT * FROM temptable_sql_laptop_data
+# MAGIC SELECT * FROM temptable_sql_churn_modelling
 
 # COMMAND ----------
 
-df = spark.table("temptable_sql_laptop_data")
+df = spark.table("temptable_sql_churn_modelling")
 display(df)
 
 # COMMAND ----------
@@ -92,9 +92,9 @@ display(df)
 
 # COMMAND ----------
 
-df = spark.table(f"{catalog_name}.default.laptop_prices_euro")
-df.createOrReplaceTempView("temptable_python_laptop_data")
-display(spark.table("temptable_sql_laptop_data"))
+df = spark.table(f"{catalog_name}.default.churn_modelling")
+df.createOrReplaceTempView("temptable_python_churn_modelling")
+display(spark.table("temptable_sql_churn_modelling"))
 
 
 # COMMAND ----------
@@ -117,34 +117,34 @@ display(spark.table("temptable_sql_laptop_data"))
 
 import pyspark.sql.functions as f
 
-df = spark.table(f"{catalog_name}.default.laptop_prices_euro")
-df.write.format("delta").mode("append").saveAsTable(f"{catalog_name}.default.laptop_prices_euro") # append new rows to existing dataframe
+df = spark.table(f"{catalog_name}.default.churn_modelling")
+df.write.format("delta").mode("append").saveAsTable(f"{catalog_name}.default.churn_modelling") # append new rows to existing dataframe
 
 # add a new column and append
 (
     df
-    .withColumn("Price_euros_2", f.col("Price_euros"))
+    .withColumn("Balance_2", f.col("Balance"))
     .write
     .format("delta")
     .mode("append")
     .option("mergeSchema", "true") # option to merge schemas for new columns
-    .saveAsTable(f"{catalog_name}.default.laptop_prices_euro")
+    .saveAsTable(f"{catalog_name}.default.churn_modelling")
 )
 
 
 # COMMAND ----------
 
-spark.sql(f"DESCRIBE HISTORY {catalog_name}.default.laptop_prices_euro").display()
+spark.sql(f"DESCRIBE HISTORY {catalog_name}.default.churn_modelling").display()
 
 # COMMAND ----------
 
-df_v0 = spark.table(f"{catalog_name}.default.laptop_prices_euro@v0")
+df_v0 = spark.table(f"{catalog_name}.default.churn_modelling@v0")
 print(df_v0.count(), len(df_v0.columns))
 
-df_v1 = spark.table(f"{catalog_name}.default.laptop_prices_euro@v1")
+df_v1 = spark.table(f"{catalog_name}.default.churn_modelling@v1")
 print(df_v1.count(), len(df_v1.columns))
 
-df_v2 = spark.table(f"{catalog_name}.default.laptop_prices_euro@v2")
+df_v2 = spark.table(f"{catalog_name}.default.churn_modelling@v2")
 print(df_v2.count(), len(df_v2.columns))
 
 
@@ -156,7 +156,7 @@ print(df_v2.count(), len(df_v2.columns))
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT count(*) FROM spyros_cavadias.default.laptop_prices_euro VERSION AS OF 0
+# MAGIC SELECT count(*) FROM panagiotis_goumenakis.default.churn_modelling VERSION AS OF 0
 
 # COMMAND ----------
 
@@ -212,7 +212,7 @@ print(df_v2.count(), len(df_v2.columns))
 
 # COMMAND ----------
 
-path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
+path = f"file:/Workspace/Users/{user_email}/churn_modelling.csv"
 # <TODO>
 
 # COMMAND ----------
@@ -222,7 +222,7 @@ path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
 
 # COMMAND ----------
 
-table_name = "my_uploaded_laptop_price_table"
+table_name = "my_uploaded_churn_modelling_table"
 # <TODO>
 
 # COMMAND ----------
@@ -242,7 +242,7 @@ table_name = "my_uploaded_laptop_price_table"
 # MAGIC %md
 # MAGIC ### 6. Share the table with the person sitting next to you so they can read it from your catalog
 # MAGIC This can be done either through the GUI or SQL commands such as: 
-# MAGIC `GRANT <permission> ON <object> <objectname>` for example `GRANT SELECT ON TABLE sds_catalog.default.laptop_data`
+# MAGIC `GRANT <permission> ON <object> <objectname>` for example `GRANT SELECT ON TABLE sds_catalog.default.churn_modelling`
 
 # COMMAND ----------
 
@@ -259,7 +259,7 @@ table_name = "my_uploaded_laptop_price_table"
 
 # 3.
 # # Make sure you have uploaded the file
-# path = f"file:/Workspace/Users/{user_email}/laptop_price_euro.csv"
+# path = f"file:/Workspace/Users/{user_email}/churn_modelling.csv"
 # dbutils.fs.ls(path)
 # df = spark.read.format("csv").option("header", True).load(path)
 # display(df)
@@ -267,7 +267,7 @@ table_name = "my_uploaded_laptop_price_table"
 # COMMAND ----------
 
 # 4.
-# table_name = "my_uploaded_laptop_price_table"
+# table_name = "my_uploaded_churn_modelling_table"
 # df.write.format("delta").saveAsTable(f"{catalog_name}.default.{table_name}")
 # display(spark.table(f"{catalog_name}.default.{table_name}"))
 
@@ -276,21 +276,21 @@ table_name = "my_uploaded_laptop_price_table"
 
 # MAGIC %sql
 # MAGIC -- 4.
-# MAGIC -- DESCRIBE table EXTENDED spyros_cavadias.default.my_uploaded_laptop_price_table
-# MAGIC -- DESCRIBE DETAIL spyros_cavadias.default.my_uploaded_laptop_price_table
-# MAGIC -- DESCRIBE HISTORY spyros_cavadias.default.my_uploaded_laptop_price_table
+# MAGIC -- DESCRIBE table EXTENDED panagiotis_goumenakis.default.my_uploaded_churn_modelling_table
+# MAGIC -- DESCRIBE DETAIL panagiotis_goumenakis.default.my_uploaded_churn_modelling_table
+# MAGIC -- DESCRIBE HISTORY panagiotis_goumenakis.default.my_uploaded_churn_modelling_table
 
 # COMMAND ----------
 
 # MAGIC %sql
 # MAGIC -- 5.
-# MAGIC -- GRANT SELECT on TABLE spyros_cavadias.default.my_uploaded_laptop_price_table TO robert.yousif@d-one.ai
+# MAGIC -- GRANT SELECT on TABLE panagiotis_goumenakis.default.my_uploaded_churn_modelling_table TO spyros_cavadias@ms.d-one.ai
 
 # COMMAND ----------
 
 # MAGIC %sql
 # MAGIC -- 6.
-# MAGIC -- GRANT SELECT on TABLE spyros_cavadias.default.my_uploaded_laptop_price_table TO robert.yousif@d-one.ai
+# MAGIC -- GRANT SELECT on TABLE panagiotis_goumenakis.default.my_uploaded_churn_modelling_table TO spyros_cavadias@ms.d-one.ai
 
 # COMMAND ----------
 

@@ -29,8 +29,8 @@
 # COMMAND ----------
 
 # set up the below params
-user_email = "spyros.cavadias@ms.d-one.ai"
-user_name = "spyros_cavadias"
+user_email = "" #<firstname.lastname@emailprovider.xx>
+user_name = "" #<firstname_lastname>
 
 # COMMAND ----------
 
@@ -44,28 +44,30 @@ df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 from sklearn.model_selection import train_test_split
 import pandas as pd
+import numpy as np
 
 # one-hot encode categorical columns 
 #categorical data
-categorical_cols = ['Company', 'TypeName', 'operating_system','memory_type','cpu_manufacturer','gpu_manufacturer']
+categorical_cols = ['Geography', 'Gender', ]
 # get_dummies
-enriched_df = pd.get_dummies(df, columns = categorical_cols)
+enriched_df = pd.get_dummies(df, columns = categorical_cols).astype(np.float64)
+enriched_df['Exited'] = enriched_df['Exited'].astype('int64')
 
 # train test split 
-train_df, test_df, _, _ = train_test_split(enriched_df, enriched_df[["Price_euros"]].values.ravel(), test_size=0.1, random_state=42)
+train_df, test_df, _, _ = train_test_split(enriched_df, enriched_df[["Exited"]].values.ravel(), test_size=0.1, random_state=42)
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC
-# MAGIC We can now use AutoML to search for the optimal <a href="https://docs.databricks.com/applications/machine-learning/automl.html#regression" target="_blank">regression</a> model. 
+# MAGIC We can now use AutoML to search for the optimal <a href="https://docs.databricks.com/en/machine-learning/automl/train-ml-model-automl-api.html#classification-specification" target="_blank">classification</a> model. 
 # MAGIC
 # MAGIC Required parameters:
 # MAGIC * **`dataset`** - Input Spark or pandas DataFrame that contains training features and targets. If using a Spark DataFrame, it will convert it to a Pandas DataFrame under the hood by calling .toPandas() - just be careful you don't OOM!
 # MAGIC * **`target_col`** - Column name of the target labels
 # MAGIC
 # MAGIC We will also specify these optional parameters:
-# MAGIC * **`primary_metric`** - Primary metric to select the best model. Each trial will compute several metrics, but this one determines which model is selected from all the trials. One of **`r2`** (default, R squared), **`mse`** (mean squared error), **`rmse`** (root mean squared error), **`mae`** (mean absolute error) for regression problems.
+# MAGIC * **`primary_metric`** - Primary metric to select the best model. Each trial will compute several metrics, but this one determines which model is selected from all the trials. One of **`f1`** (default, f1 score), **`log_loss`** (logistic loss or cross-entropy loss), **`precision`**, **`accuracy`**, **`roc_auc`** for classification problems.
 # MAGIC * **`timeout_minutes`** - The maximum time to wait for the AutoML trials to complete. **`timeout_minutes=None`** will run the trials without any timeout restrictions
 # MAGIC * **`max_trials`** - The maximum number of trials to run. When **`max_trials=None`**, maximum number of trials will run to completion.
 
@@ -73,7 +75,7 @@ train_df, test_df, _, _ = train_test_split(enriched_df, enriched_df[["Price_euro
 
 from databricks import automl
 
-summary = automl.regress(train_df, target_col="Price_euros", primary_metric="rmse", timeout_minutes=5, max_trials=10)
+summary = automl.classify(train_df, target_col="Exited", primary_metric="f1", timeout_minutes=5, max_trials=10)
 
 # COMMAND ----------
 
@@ -104,18 +106,21 @@ print(summary.best_trial)
 
 # Load the best trial as an MLflow Model
 import mlflow
+from pyspark.sql.types import DoubleType
+import pyspark.sql.functions as f
 
 model_uri = f"runs:/{summary.best_trial.mlflow_run_id}/model"
 
 predict = mlflow.pyfunc.spark_udf(spark, model_uri)
 test_sdf = spark.createDataFrame(test_df)
-pred_sdf = test_sdf.withColumn("prediction", predict(*test_sdf.drop("Price_euros").columns))
+pred_sdf = test_sdf.withColumn("prediction", predict(*test_sdf.drop("Exited").columns)[0])
+pred_sdf = pred_sdf.withColumn("prediction", f.col("prediction").cast(DoubleType()))
 display(pred_sdf)
 
 # COMMAND ----------
 
-from pyspark.ml.evaluation import RegressionEvaluator
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
 
-regression_evaluator = RegressionEvaluator(predictionCol="prediction", labelCol="Price_euros", metricName="rmse")
-rmse = regression_evaluator.evaluate(pred_sdf)
-print(f"RMSE on test dataset: {rmse:.3f}")
+classification_evaluator = BinaryClassificationEvaluator(rawPredictionCol="prediction" ,labelCol="Exited", metricName="areaUnderROC")
+auc = classification_evaluator.evaluate(pred_sdf)
+print(f"auc score on test dataset: {auc:.3f}")

@@ -11,7 +11,7 @@ catalog_name = "" #<firstname_lastname>
 
 # COMMAND ----------
 
-df_bronze = spark.table(f"{catalog_name}.bronze.laptop_prices_euro")
+df_bronze = spark.table(f"{catalog_name}.bronze.churn_modelling")
 display(df_bronze)
 
 # COMMAND ----------
@@ -25,24 +25,24 @@ df_bronze.printSchema()
 
 # COMMAND ----------
 
-from pyspark.sql.functions import expr
+import pyspark.sql.functions as f
 from pyspark.sql.types import StringType, DateType, FloatType, IntegerType
 
-df_laptop_bronze = spark.table(f"{catalog_name}.bronze.laptop_prices_euro")
+df_churn_bronze = spark.table(f"{catalog_name}.bronze.churn_modelling")
 
-df_laptop_silver = (
-    df_bronze.withColumn("Inches", df_bronze["Inches"].cast(FloatType()))
-    .withColumn("Price_euros", df_bronze["Price_euros"].cast(FloatType()))
-    .withColumn("laptop_ID", df_bronze["laptop_ID"].cast(IntegerType()))
-    .withColumn("Weight", expr("substring(Weight, 0, length(Weight)-2)").cast(FloatType()))
-    .withColumnRenamed("Weight", "Weight_Kg")
+df_churn_silver = (
+    df_bronze.withColumn("Balance", df_bronze["Balance"].cast(FloatType()))
+    .withColumn("EstimatedSalary", df_bronze["EstimatedSalary"].cast(FloatType()))
+    .withColumn("CustomerId", df_bronze["CustomerId"].cast(IntegerType()))
+    .withColumn("Gender_Male", f.when(df_bronze["Gender"] == 'Male', 1).otherwise(0))
+    .withColumnRenamed("Gender", "Gender_obj")
 )
 
-display(df_laptop_silver)
+df_churn_silver.limit(5).display()
 
 # COMMAND ----------
 
-df_laptop_silver.printSchema()
+df_churn_silver.printSchema()
 
 # COMMAND ----------
 
@@ -68,14 +68,14 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.silver")
 # COMMAND ----------
 
 schema_name = "silver"
-table_name = "laptop_prices"
+table_name = "churn_modelling"
 
-df_laptop_silver.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+df_churn_silver.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
 
 # COMMAND ----------
 
-display(spark.table(f"{catalog_name}.{schema_name}.{table_name}"))
+display(spark.table(f"{catalog_name}.{schema_name}.{table_name}").limit(3))
 
 # COMMAND ----------
 
@@ -103,9 +103,9 @@ dbutils.notebook.exit("End of notebook when running as a workflow task")
 # COMMAND ----------
 
 schema_name = "silver"
-table_name = "laptop_prices"
+table_name = "churn_modelling"
 
-df_laptop_silver.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}_testmerg")
+df_churn_silver.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}_testmerg")
 
 
 # COMMAND ----------
@@ -115,8 +115,8 @@ df_laptop_silver.write.format("delta").mode("overwrite").option("mergeSchema", "
 
 # COMMAND ----------
 
-df_laptop_silver_mergeSchema = (
-    df_laptop_silver.withColumnRenamed("Weight_Kg", "Weight_Kgs")
+df_churn_silver_mergeSchema = (
+    df_churn_silver.withColumnRenamed("Gender_obj", "Gender")
 )
 
 # COMMAND ----------
@@ -126,7 +126,7 @@ df_laptop_silver_mergeSchema = (
 
 # COMMAND ----------
 
-(df_laptop_silver_mergeSchema
+(df_churn_silver_mergeSchema
     .write.format("delta")
     .mode("overwrite")
     .saveAsTable(f"{catalog_name}.{schema_name}.{table_name}_testmerge"))
@@ -138,4 +138,4 @@ df_laptop_silver_mergeSchema = (
 
 # COMMAND ----------
 
-df_laptop_silver_mergeSchema.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}_testmerge")
+df_churn_silver_mergeSchema.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}_testmerge")

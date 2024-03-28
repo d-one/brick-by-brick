@@ -12,7 +12,7 @@
 # MAGIC
 # MAGIC # MLflow
 # MAGIC
-# MAGIC <a href="https://mlflow.org/docs/latest/concepts.html" target="_blank">MLflow</a> seeks to address these three core issues:
+# MAGIC <a href="https://mlflow.org/docs/latest/" target="_blank">MLflow</a> seeks to address these three core issues:
 # MAGIC
 # MAGIC * It’s difficult to keep track of experiments
 # MAGIC * It’s difficult to reproduce code
@@ -46,7 +46,7 @@
 # MAGIC Each run can record the following information:<br><br>
 # MAGIC
 # MAGIC - **Parameters:** Key-value pairs of input parameters such as the number of trees in a random forest model
-# MAGIC - **Metrics:** Evaluation metrics such as RMSE or Area Under the ROC Curve
+# MAGIC - **Metrics:** Evaluation metrics such as f1 score or Area Under the ROC Curve
 # MAGIC - **Artifacts:** Arbitrary output files in any format.  This can include images, pickled models, and data files
 # MAGIC - **Source:** The code that originally ran the experiment
 # MAGIC
@@ -59,10 +59,11 @@ import mlflow.sklearn
 from mlflow.models.signature import infer_signature
 
 import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import roc_auc_score, f1_score, roc_curve
 from sklearn.model_selection import train_test_split
-from math import sqrt, log, exp
 
 # COMMAND ----------
 
@@ -87,113 +88,120 @@ df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # one-hot encode categorical columns 
 #categorical data
-categorical_cols = ['Company', 'TypeName', 'operating_system','memory_type','cpu_manufacturer','gpu_manufacturer']
+categorical_cols = ['Geography', 'Gender', ]
 # get_dummies
-enriched_df = pd.get_dummies(df, columns = categorical_cols)
+enriched_df = pd.get_dummies(df, columns = categorical_cols).astype(np.float64)
 
 # train test split 
-X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Price_euros"], axis=1), enriched_df[["Price_euros"]].values.ravel(), test_size=0.1, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Exited"], axis=1), enriched_df[["Exited"]].values.ravel(), test_size=0.1, random_state=42)
 
 
 # COMMAND ----------
 
 # set experiment name 
-experiment = mlflow.set_experiment(f"/Users/{user_email}/amld_mlflow_experiment")
+experiment = mlflow.set_experiment(f"/Users/{user_email}/opap_mlflow_experiment")
 
 # COMMAND ----------
 
-with mlflow.start_run(run_name="LR-Numerical-Features") as run:
+with mlflow.start_run(run_name="LR-Categorical-Features") as run:
     # Define pipeline
-    lr = LinearRegression()
-    features = ["screen_size_norm",	"total_pixels","ram_size","weight_kg","memory_size","cpu_clock_spead"]
+    lr = LogisticRegression()
+    features = [
+        'Geography_France', 'Geography_Germany', 'Geography_Spain',
+        'Gender_Female', 'Gender_Male'
+    ]
     model = lr.fit(X_train[features], y_train)
 
     # Log parameters
-    mlflow.log_param("label", "price")
     mlflow.log_param("features", features)
 
     # Log model
     mlflow.sklearn.log_model(model, "model", input_example=X_train[features].head(5)) 
 
     # Evaluate predictions
-    pred = model.predict(X_test[features])
-    rmse = sqrt(mean_squared_error(y_test, pred))
+    pred_proba = model.predict_proba(X_test[features])
+    auc = roc_auc_score(y_test, pred_proba[:, 1])
 
     # Log metrics
-    mlflow.log_metric("rmse", rmse)
+    mlflow.log_metric("auc", auc)
 
 # COMMAND ----------
 
 # MAGIC %md 
 # MAGIC
-# MAGIC There, all done! Let's go through the other two linear regression models and then compare our runs. 
+# MAGIC There, all done! Let's go through the other two logistic regression models and then compare our runs. 
 # MAGIC
-# MAGIC Next let's build our linear regression model but use all of our features.
+# MAGIC Next let's build our logistic regression model but use all of our features.
 
 # COMMAND ----------
 
-
 with mlflow.start_run(run_name="LR-All-Features") as run:
     # Define pipeline
-    lr = LinearRegression()
+    lr = LogisticRegression()
     model = lr.fit(X_train, y_train)
 
     # Log parameters
-    mlflow.log_param("label", "price")
     mlflow.log_param("features", "all_features")
 
     # Log model
     mlflow.sklearn.log_model(model, "model", input_example=X_train.head(5)) 
 
     # Evaluate predictions
+    pred_proba = model.predict_proba(X_test)
     pred = model.predict(X_test)
-    rmse = sqrt(mean_squared_error(y_test, pred))
-    r2 = r2_score(y_test, pred)
+
+    auc = roc_auc_score(y_test, pred_proba[:, 1])
+    f1_score_all_feat = f1_score(y_test, pred)
 
     # Log metrics
-    mlflow.log_metric("rmse", rmse)
-    mlflow.log_metric("r2", r2)
+    mlflow.log_metric("auc", auc)
+    mlflow.log_metric("f1_score", f1_score_all_feat)
 
 # COMMAND ----------
 
 # MAGIC %md 
 # MAGIC
-# MAGIC Finally, we will use Linear Regression to predict the log of the price, due to its log normal distribution. 
+# MAGIC Finally, we will use Logistic Regression on scaled features to predict the target variable 
 # MAGIC
-# MAGIC We'll also practice logging artifacts to keep a visual of our log normal histogram.
+# MAGIC We'll also practice logging artifacts to keep a visual of the receiver operating characteristic curve.
 
 # COMMAND ----------
 
 import matplotlib.pyplot as plt
 
-with mlflow.start_run(run_name="LR-Log-Price") as run:
-    lr = LinearRegression()
-    y_train_log = [log(x) for x in y_train]
-    model = lr.fit(X_train, y_train_log)
+with mlflow.start_run(run_name="LR-Scaled-Features") as run:
+    lr = LogisticRegression()
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    model = lr.fit(X_train_scaled, y_train)
 
     # Log parameters
-    mlflow.log_param("label", "log_price")
-    mlflow.log_param("features", "all_features")
+    mlflow.log_param("features", "all_features_scaled")
 
     # Log model
     mlflow.sklearn.log_model(model, "model", input_example=X_train.head(5)) 
 
     # Evaluate predictions
-    log_pred = model.predict(X_test)
-    pred = [exp(x) for x in log_pred]
-    rmse = sqrt(mean_squared_error(y_test, pred))
-    r2 = r2_score(y_test, pred)
+    pred_proba = model.predict_proba(X_test_scaled)
+    pred = model.predict(X_test_scaled)
+
+    auc = roc_auc_score(y_test, pred_proba[:, 1])
+    fpr, tpr, _ = roc_curve(y_test,  pred_proba[:, 1])
+    f1_score_scaled_feat = f1_score(y_test, pred)
 
     # Log metrics
-    mlflow.log_metric("rmse", rmse)
-    mlflow.log_metric("r2", r2)
+    mlflow.log_metric("auc", auc)
+    mlflow.log_metric("f1_score", f1_score_scaled_feat)
 
     # Log artifact
-    plt.clf()
+    plt.plot(fpr,tpr,label="data 1, auc="+str(auc))
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.savefig("roc.png")
 
-    pd.DataFrame(y_train_log, columns = ["log_price"]).hist(column="log_price", bins=100)
-    fig = plt.gcf()
-    mlflow.log_figure(fig, "log_normal.png")
+    mlflow.log_artifact("roc.png")
     plt.show()
 
 # COMMAND ----------
@@ -220,7 +228,7 @@ client = MlflowClient()
 
 # MAGIC %md 
 # MAGIC
-# MAGIC You can also use <a href="https://mlflow.org/docs/latest/search-syntax.html" target="_blank">search_runs</a> to find all runs for a given experiment.
+# MAGIC You can also use <a href="https://www.mlflow.org/docs/1.24.0/search-syntax.html" target="_blank">search_runs</a> to find all runs for a given experiment.
 
 # COMMAND ----------
 
