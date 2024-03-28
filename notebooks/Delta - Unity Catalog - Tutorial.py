@@ -176,7 +176,7 @@ print(df_v2.count(), len(df_v2.columns))
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 1. Download the data from the repository: [laptop_price_euro](https://github.com/d-one/brick-by-brick/blob/main/data/laptop_price_euro.csv)
+# MAGIC 1. Download the data from the repository: [churn_modelling](https://github.com/d-one/brick-by-brick/blob/churn_prediction/data/churn_modelling.csv)
 # MAGIC 2. Upload the data as a workspace object to your personal directory.
 # MAGIC 3. Read the data and display it
 # MAGIC 4. Write to your own table inside your own catalog and schema
@@ -187,7 +187,7 @@ print(df_v2.count(), len(df_v2.columns))
 
 # MAGIC %md
 # MAGIC ### 1. Download the data from the repository
-# MAGIC Click on this [link](https://github.com/d-one/brick-by-brick/blob/main/data/laptop_price_euro.csv) and download the data directly from github to your local machine. (You will find a `Download Raw File` Button at the top right of the document preview inside gitlab.)
+# MAGIC Click on this [link](https://github.com/d-one/brick-by-brick/blob/churn_prediction/data/churn_modelling.csv) and download the data directly from github to your local machine. (You will find a `Download Raw File` Button at the top right of the document preview inside gitlab.)
 
 # COMMAND ----------
 
