@@ -74,7 +74,7 @@ from math import sqrt, log, exp
 
 # user parameters
 user_email = spark.sql('select current_user() as user').collect()[0]['user']
-catalog_name = user_email.split('@')[0].replace(".", "_")
+catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
 
 # COMMAND ----------
 
