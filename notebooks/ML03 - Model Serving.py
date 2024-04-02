@@ -49,7 +49,7 @@ def score_model(model_uri, databricks_token, data):
 # COMMAND ----------
 
 MODEL_VERSION_URI = "https://adb-1451829595406012.12.azuredatabricks.net/serving-endpoints/opap_serving_demo/invocations"
-DATABRICKS_API_TOKEN = ""
+DATABRICKS_API_TOKEN = dbutils.secrets.get(scope="bricks", key="token")
 
 # COMMAND ----------
 

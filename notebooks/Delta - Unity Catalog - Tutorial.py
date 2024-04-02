@@ -9,7 +9,7 @@
 # COMMAND ----------
 
 user_email = spark.sql('select current_user() as user').collect()[0]['user']
-catalog_name = user_email.split('@')[0].replace(".", "_")
+catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
 
 # COMMAND ----------
 
@@ -290,7 +290,9 @@ table_name = "my_uploaded_churn_modelling_table"
 
 # MAGIC %sql
 # MAGIC -- 6.
-# MAGIC -- GRANT SELECT on TABLE panagiotis_goumenakis.default.my_uploaded_churn_modelling_table TO spyros_cavadias@ms.d-one.ai
+# MAGIC -- GRANT USAGE ON CATALOG panagiotis_goumenakis TO `spyros.cavadias@ms.d-one.ai`
+# MAGIC -- GRANT USAGE ON SCHEMA panagiotis_goumenakis.default TO `spyros.cavadias@ms.d-one.ai`
+# MAGIC -- GRANT SELECT on TABLE panagiotis_goumenakis.default.my_uploaded_churn_modelling_table TO `spyros.cavadias@ms.d-one.ai`
 
 # COMMAND ----------
 
