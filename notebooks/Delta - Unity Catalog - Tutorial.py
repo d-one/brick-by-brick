@@ -290,6 +290,8 @@ table_name = "my_uploaded_laptop_price_table"
 
 # MAGIC %sql
 # MAGIC -- 6.
+# MAGIC -- GRANT USAGE ON CATALOG spyros_cavadias TO robert.yousif@d-one.ai
+# MAGIC -- GRANT USAGE ON SCHEMA spyros_cavadias.default TO robert.yousif@d-one.ai
 # MAGIC -- GRANT SELECT on TABLE spyros_cavadias.default.my_uploaded_laptop_price_table TO robert.yousif@d-one.ai
 
 # COMMAND ----------
