@@ -26,31 +26,13 @@ display(df_silver)
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   Company,
-# MAGIC   count(Company) as num_of_laptops,
-# MAGIC   AVG(Price_euros) as avg_price,
-# MAGIC   AVG(Weight_kg/Inches) as weight_per_inch
-# MAGIC FROM
-# MAGIC   robert_yousif.silver.laptop_prices
-# MAGIC GROUP BY
-# MAGIC   Company
-# MAGIC ORDER BY
-# MAGIC   num_of_laptops DESC
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
 df_laptop_gold_1 = spark.sql(
     f"""
     SELECT
         Company,
         count(Company) as num_of_laptops,
-        AVG(Price_euros) as avg_price
+        AVG(Price_euros) as avg_price,
+        AVG(Weight_kg/Inches) as weight_per_inch
     FROM
         {catalog_name}.silver.laptop_prices
     GROUP BY
