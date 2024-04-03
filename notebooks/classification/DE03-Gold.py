@@ -26,27 +26,13 @@ display(df_silver.limit(5))
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   Geography,
-# MAGIC   count(CustomerId) as num_customers,
-# MAGIC   AVG(Balance) as avg_balance,
-# MAGIC   AVG(Age) as avg_age
-# MAGIC FROM
-# MAGIC   panagiotis_goumenakis.silver.churn_modelling
-# MAGIC GROUP BY
-# MAGIC   Geography
-# MAGIC ORDER BY
-# MAGIC   num_customers DESC
-
-# COMMAND ----------
-
 df_churn_gold_1 = spark.sql(
     f"""
     SELECT
         Geography,
         count(CustomerId) as num_customers,
-        AVG(Balance) as avg_balance
+        AVG(Balance) as avg_balance,
+        AVG(Age) as avg_age
     FROM
         {catalog_name}.silver.churn_modelling
     GROUP BY
