@@ -17,7 +17,7 @@ Repository for the D ONE databricks brick-by-brick workshop
 
 
 # 1. Setup Workspace
-Login to the [workspace](https://adb-1451829595406012.12.azuredatabricks.net/?o=1451829595406012#) using the email address you used to sign-up for the workshop.
+Login to the [workspace](https://adb-1451829595406012.12.azuredatabricks.net/?o=1451829595406012#).
 
 ## Adding the repository
 Adding the repository to your workspace: 
@@ -31,8 +31,8 @@ Now you should see a repository named `brick-by-brick` under your own directory.
 ## Create a personal cluster to your workspace.
 1. Click on the `Compute` tab in the navigation menu to the left.
 2. Click on Create compute and choose the following settings:
-3. Choose the `sds-compute-policy` Policy
-3. Make sure the `Single user access` is under your name
+3. Choose the `bricks-compute-policy` Policy
+3. Make sure the `Single user access` is under your user
 4. Click on `Create Cluster`
 
 # 2. 3 Notebooks - the medallion architecture
@@ -44,12 +44,12 @@ Go to the following notebooks and follow the instructions:
 # 3. Creating a Workflow Job
 1. Click on the `Workflows` tab in the navigation menu to the left.
 2. Click on the `Create job` button.
-3. Add a Job name for your Workflow at the top: `my_medallion_job_<firstname>_<lastname>`.
+3. Add a Job name for your Workflow at the top: `bricks-<user_number>`.
 3. Choose the following settings
    * **Task Name**: `bronze_task`
    * **Source**: `Workspace`
    * **Path**: Click on `Select Notebook` and choose your Bronze Notebook
-   * **Cluster**: Choose your existing All-Purpose-Cluster you created in your first exercise. 
+   * **Cluster**: Choose your existing cluster that you created in your first exercise. 
 4. Click on `Create`
    * Now you have created a workflow Job with one task inside.
 5. Click on `Add task` and choose `Notebook`
