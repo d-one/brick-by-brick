@@ -77,15 +77,15 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.silver")
 
 # COMMAND ----------
 
-dbutils.jobs.taskValues.set(key = "enough_rows_churn_silver", value = df_churn_gold_1.count())
-
-# COMMAND ----------
-
 schema_name = "silver"
 table_name = "churn_modelling"
 
 df_churn_silver.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
+
+# COMMAND ----------
+
+dbutils.jobs.taskValues.set(key = "enough_rows_churn_silver", value = df_churn_silver.count())
 
 # COMMAND ----------
 
