@@ -92,8 +92,11 @@ spark.sql(
 
 schema_name = "bronze"
 table_name = "churn_modelling"
-
-df_churn_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+# based on the parameter given we overwrite or append the table
+if _OVERWRITE_TABLE:
+    df_churn_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+else:
+    df_churn_raw.write.format("delta").mode("append").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
 
 # COMMAND ----------
