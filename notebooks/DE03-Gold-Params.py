@@ -7,7 +7,7 @@
 
 # ********* workflow parameters ********* #
 # set parameters here only if running notebook, for example:
-# dbutils.widgets.text("CATALOG_NAME", "uat_scratch_kni")
+# dbutils.widgets.text("CATALOG_NAME", "konstantinos_ninas")
 
 # COMMAND ----------
 
@@ -42,7 +42,7 @@ display(df_silver.limit(5))
 # MAGIC   AVG(Balance) as avg_balance,
 # MAGIC   AVG(Age) as avg_age
 # MAGIC FROM
-# MAGIC   panagiotis_goumenakis.silver.churn_modelling
+# MAGIC   konstantinos_ninas.silver.churn_modelling
 # MAGIC GROUP BY
 # MAGIC   Geography
 # MAGIC ORDER BY

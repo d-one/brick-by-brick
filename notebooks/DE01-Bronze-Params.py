@@ -17,8 +17,7 @@
 
 # ********* workflow parameters ********* #
 # set parameters here only if running notebook, for example:
-# dbutils.widgets.text("CATALOG_NAME", "uat_scratch_kni")
-# dbutils.widgets.text("OVERWRITE_TABLE", "False")
+# dbutils.widgets.text("CATALOG_NAME", "konstantinos_ninas")
 
 # COMMAND ----------
 
@@ -28,9 +27,6 @@ try:
     catalog_name = dbutils.widgets.get("CATALOG_NAME")
 except:
     catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
-
-# specify if the table should be overwritten or appended
-_OVERWRITE_TABLE = eval(dbutils.widgets.get("OVERWRITE_TABLE"))
 
 # COMMAND ----------
 
@@ -73,6 +69,11 @@ spark.sql(
 
 # COMMAND ----------
 
+# we create a workflow value that identifies the rows ingested from the source 
+dbutils.jobs.taskValues.set(key = "enough_rows_churn_bronze", value = df_churn_raw.count())
+
+# COMMAND ----------
+
 # MAGIC %md 
 # MAGIC # Writing a delta table to Unity Catalog
 
@@ -92,12 +93,8 @@ spark.sql(
 
 schema_name = "bronze"
 table_name = "churn_modelling"
-# based on the parameter given we overwrite or append the table
-if _OVERWRITE_TABLE:
-    df_churn_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
-else:
-    df_churn_raw.write.format("delta").mode("append").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
+df_churn_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
 # COMMAND ----------
 

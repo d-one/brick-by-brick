@@ -8,7 +8,8 @@
 
 # ********* workflow parameters ********* #
 # set parameters here only if running notebook, for example:
-# dbutils.widgets.text("CATALOG_NAME", "uat_scratch_kni")
+# dbutils.widgets.text("CATALOG_NAME", "konstantinos_ninas")
+# dbutils.widgets.text("OVERWRITE_TABLE", "False")
 
 # COMMAND ----------
 
@@ -18,6 +19,9 @@ try:
     catalog_name = dbutils.widgets.get("CATALOG_NAME")
 except:
     catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+
+# specify if the table should be overwritten or appended
+_OVERWRITE_TABLE = eval(dbutils.widgets.get("OVERWRITE_TABLE"))
 
 # COMMAND ----------
 
@@ -80,12 +84,13 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.silver")
 schema_name = "silver"
 table_name = "churn_modelling"
 
-df_churn_silver.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
-
-
-# COMMAND ----------
-
-dbutils.jobs.taskValues.set(key = "enough_rows_churn_silver", value = df_churn_silver.count())
+# overwrite or append the table based on the workflow parameter
+if _OVERWRITE_TABLE:
+    df_churn_silver.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+    print(f"table {catalog_name}.{schema_name}.{table_name} overwritten")
+else:
+    df_churn_silver.write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+    print(f"table {catalog_name}.{schema_name}.{table_name} appended")
 
 # COMMAND ----------
 
