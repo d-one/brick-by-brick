@@ -50,7 +50,7 @@ catalog_name
 # MAGIC -- add it without the string ('') markers
 # MAGIC
 # MAGIC -- SELECT * FROM user_catalog.default.churn_modelling
-# MAGIC SELECT * FROM panagiotis_goumenakis.default.churn_modelling
+# MAGIC SELECT * FROM opapbricks_X.default.churn_modelling
 
 # COMMAND ----------
 
@@ -74,7 +74,7 @@ df.display()
 # MAGIC -- add it without the string ('') markers
 # MAGIC CREATE OR REPLACE TEMPORARY VIEW temptable_sql_churn_modelling
 # MAGIC AS
-# MAGIC SELECT * FROM panagiotis_goumenakis.default.churn_modelling
+# MAGIC SELECT * FROM opapbricks_X.default.churn_modelling
 
 # COMMAND ----------
 
@@ -157,7 +157,7 @@ print(df_v2.count(), len(df_v2.columns))
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT count(*) FROM panagiotis_goumenakis.default.churn_modelling VERSION AS OF 0
+# MAGIC SELECT count(*) FROM opapbricks_X.default.churn_modelling VERSION AS OF 0
 
 # COMMAND ----------
 
@@ -277,23 +277,23 @@ table_name = "my_uploaded_churn_modelling_table"
 
 # MAGIC %sql
 # MAGIC -- 4.
-# MAGIC -- DESCRIBE table EXTENDED panagiotis_goumenakis.default.my_uploaded_churn_modelling_table
-# MAGIC -- DESCRIBE DETAIL panagiotis_goumenakis.default.my_uploaded_churn_modelling_table
-# MAGIC -- DESCRIBE HISTORY panagiotis_goumenakis.default.my_uploaded_churn_modelling_table
+# MAGIC -- DESCRIBE table EXTENDED opapbricks_X.default.my_uploaded_churn_modelling_table
+# MAGIC -- DESCRIBE DETAIL opapbricks_X.default.my_uploaded_churn_modelling_table
+# MAGIC -- DESCRIBE HISTORY opapbricks_X.default.my_uploaded_churn_modelling_table
 
 # COMMAND ----------
 
 # MAGIC %sql
 # MAGIC -- 5.
-# MAGIC -- GRANT SELECT on TABLE panagiotis_goumenakis.default.my_uploaded_churn_modelling_table TO spyros_cavadias@ms.d-one.ai
+# MAGIC -- GRANT SELECT on TABLE opapbricks_X.default.my_uploaded_churn_modelling_table TO `opapbricks_X@ms.d-one.ai`
 
 # COMMAND ----------
 
 # MAGIC %sql
 # MAGIC -- 6.
-# MAGIC -- GRANT USAGE ON CATALOG panagiotis_goumenakis TO `spyros.cavadias@ms.d-one.ai`
-# MAGIC -- GRANT USAGE ON SCHEMA panagiotis_goumenakis.default TO `spyros.cavadias@ms.d-one.ai`
-# MAGIC -- GRANT SELECT on TABLE panagiotis_goumenakis.default.my_uploaded_churn_modelling_table TO `spyros.cavadias@ms.d-one.ai`
+# MAGIC -- GRANT USAGE ON CATALOG opapbricks_X TO `opapbricks_X@ms.d-one.ai`
+# MAGIC -- GRANT USAGE ON SCHEMA opapbricks_X.default TO `opapbricks_X@ms.d-one.ai`
+# MAGIC -- GRANT SELECT on TABLE opapbricks_X.default.my_uploaded_churn_modelling_table TO `opapbricks_X@ms.d-one.ai`
 
 # COMMAND ----------
 

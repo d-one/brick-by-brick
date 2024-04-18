@@ -42,7 +42,7 @@ display(df_silver.limit(5))
 # MAGIC   AVG(Balance) as avg_balance,
 # MAGIC   AVG(Age) as avg_age
 # MAGIC FROM
-# MAGIC   konstantinos_ninas.silver.churn_modelling
+# MAGIC   opapbricks_X.silver.churn_modelling
 # MAGIC GROUP BY
 # MAGIC   Geography
 # MAGIC ORDER BY
