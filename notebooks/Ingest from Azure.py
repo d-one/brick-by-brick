@@ -104,3 +104,29 @@ ingested_users_sdf = (
     ingested_users_sdf
     .saveAsTable(f"{target_schema}.{tablename}", mode="overwrite")
 )
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Mounting blob storage to databricks catalog
+
+# COMMAND ----------
+
+# Configuration details
+storage_account_name = "your_storage_account_name"
+container_name = "your_container_name"
+storage_account_access_key = "your_storage_account_access_key"
+
+# Mounting the blob storage
+dbutils.fs.mount(
+source = f"wasbs://{container_name}@{storage_account_name}.blob.core.windows.net/",
+mount_point = f"/mnt/{container_name}",
+extra_configs = {f"fs.azure.account.key.{storage_account_name}.blob.core.windows.net": storage_account_access_key}
+)
+
+# Verify the mount
+display(dbutils.fs.ls(f"/mnt/{container_name}"))
+
+# COMMAND ----------
+
+
