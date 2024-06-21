@@ -1,4 +1,14 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC # **Ingesting Kafka Streaming Data**
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Importing the necessary libraries
+
+# COMMAND ----------
+
 # import libraries
 import pyspark.sql.types as t
 import pyspark.sql.functions as f
@@ -17,6 +27,18 @@ try:
     catalog_name = dbutils.widgets.get("CATALOG_NAME")
 except:
     catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Option 1 - Ingesting from Azure Container as batch
+# MAGIC
+# MAGIC We ingest Kafka generated data that land on an Azure Container, as batch. This can be combined in a workflow with schedulers to streamline the process
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Setting up the connection to the Azure Container
 
 # COMMAND ----------
 
@@ -59,25 +81,41 @@ raw_feedback_sdf = (spark
                     .schema(schema)
                     .option("recursiveFileLookup", "true")
                     .option("pathGlobFilter","*.csv")
-                    .load("dbfs:/mnt/streamingdatacontainer-demo/")
+                    .load("dbfs:/mnt/streamingcontainer/")
 )
 
 existing_feedback_sdf = spark.read.table(f"{catalog_name}.bronze.liveactions")
 
 # COMMAND ----------
 
-# # for streaming table solution
-# raw_feedback_sdf = (spark
-#                     .readStream
-#                     .option("header", "true")
-#                     .option("delimiter",";")
-#                     .schema(schema)
-#                     .csv("dbfs:/mnt/streamingdatacontainer-demo/LiveFeedback.csv")
-# )
+# MAGIC %md
+# MAGIC Display the ingested data
 
 # COMMAND ----------
 
-display(raw_feedback_sdf)
+raw_feedback_sdf.display()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Option 2 - Ingesting from Azure Container real-time
+# MAGIC
+# MAGIC We ingest Kafka generated data that land on an Azure Container, real-time, as they come
+
+# COMMAND ----------
+
+# for streaming table solution
+raw_feedback_live_sdf = (spark
+                    .readStream
+                    .option("header", "true")
+                    .option("delimiter",";")
+                    .schema(schema)
+                    .csv("dbfs:/mnt/streamingcontainer/")
+)
+
+# COMMAND ----------
+
+display(raw_feedback_live_sdf)
 
 # COMMAND ----------
 
