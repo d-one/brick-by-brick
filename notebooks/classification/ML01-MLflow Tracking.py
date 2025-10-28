@@ -75,12 +75,13 @@ from sklearn.model_selection import train_test_split
 
 # user parameters
 user_email = spark.sql('select current_user() as user').collect()[0]['user']
-catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+user_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+catalog_name = "placeholder_catalog"
+schema_name = "placeholder_schema"
 
 # COMMAND ----------
 
-schema_name = "silver"
-table_name = "features"
+table_name = f"features_{user_name}"
 
 df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
@@ -99,7 +100,7 @@ X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Exited"],
 # COMMAND ----------
 
 # set experiment name 
-experiment = mlflow.set_experiment(f"/Users/{user_email}/opap_mlflow_experiment")
+experiment = mlflow.set_experiment(f"/Users/{user_email}/workshop_mlflow_experiment")
 
 # COMMAND ----------
 

@@ -30,25 +30,32 @@ import re
 
 # user parameters
 user_email = spark.sql('select current_user() as user').collect()[0]['user']
-catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
-workshop_catalog_name = "opap_catalog"
+user_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+catalog_name = "placeholder_catalog"
 
 # COMMAND ----------
 
-schema_name = "bronze"
-table_name = "churn_modelling"
+path = f"file:/Workspace/Repos/{user_email}/brick-by-brick/data/churn_modelling.csv"
 
-# create catalog if not exists
-spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog_name}")
+dbutils.fs.ls(path)
 
-# create schema if not exists
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.{schema_name}") 
+# COMMAND ----------
 
-# if bronze table not available, clone it from workshop catalog
-if table_name not in spark.sql(f"SHOW TABLES IN {catalog_name}.{schema_name}").toPandas()['tableName'].tolist():
-    spark.sql(f"CREATE TABLE IF NOT EXISTS {catalog_name}.{schema_name}.{table_name} SHALLOW CLONE {workshop_catalog_name}.{schema_name}.{table_name}") 
+try:
+    sdf_raw = spark.read.format("csv").option("header", "true").load(path)
+except:
+    print("File does not exist, please make sure that your path is correct and that you have pulled the repository to databricks repos")
 
-sdf_raw = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}")
+# COMMAND ----------
+
+# write data
+
+catalog_name = "placeholder_catalog"
+schema_name = "placeholder_schema"
+table_name = f"churn_modelling_{user_name}"
+
+sdf_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
+
 
 # COMMAND ----------
 
@@ -116,14 +123,7 @@ features_sdf.printSchema()
 
 # COMMAND ----------
 
-target_schema_name = "silver"
-target_table_name = "features"
-
-spark.sql(
-    f"""
-    CREATE SCHEMA IF NOT EXISTS {catalog_name}.{target_schema_name}
-    """
-)
+target_table_name = f"features_{user_name}"
 
 features_sdf.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{target_schema_name}.{target_table_name}")
 

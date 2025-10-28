@@ -9,38 +9,26 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Model Registry
+# MAGIC # Model Registry in Unity catalog
 # MAGIC
-# MAGIC MLflow Model Registry is a collaborative hub where teams can share ML models, work together from experimentation to online testing and production, integrate with approval and governance workflows, and monitor ML deployments and their performance.  This notebook explores how to manage models using the MLflow model registry.
+# MAGIC Model Registry in Unity catalog builds on top of MLflow Model Registry is a collaborative hub where teams can share ML models, work together from experimentation to online testing and production, integrate with approval and governance workflows, and monitor ML deployments and their performance.  This notebook explores how to manage models using the MLflow model registry.
 # MAGIC
 # MAGIC
 # MAGIC In this notebook we will:
 # MAGIC  - Register a model using MLflow
 # MAGIC  - Manage the model lifecycle
-# MAGIC  - Archive and delete models
+# MAGIC  - Alias and delete models
 # MAGIC
-
-# COMMAND ----------
-
-# MAGIC %md-sandbox <i18n value="fe857eeb-6119-4927-ad79-77eaa7bffe3a"/>
+# MAGIC Registering models in Unity Catalog allows:<br><br>
 # MAGIC
+# MAGIC * Namespacing and governance for models.
+# MAGIC * Sharing of models across:
+# MAGIC   * workspaces in the same metastore (UC)
+# MAGIC   * workspaces in other metastores (Delta Sharing)
+# MAGIC * Centralized access control, auditing, lineage, and model discovery across workspaces.
+# MAGIC * Model deployment via aliases.
 # MAGIC
-# MAGIC
-# MAGIC ### Model Registry
-# MAGIC
-# MAGIC The MLflow Model Registry component is a centralized model store, set of APIs, and UI, to collaboratively manage the full lifecycle of an MLflow Model. It provides model lineage (which MLflow Experiment and Run produced the model), model versioning, stage transitions (e.g. from staging to production), annotations (e.g. with comments, tags), and deployment management (e.g. which production jobs have requested a specific model version).
-# MAGIC
-# MAGIC Model registry has the following features:<br><br>
-# MAGIC
-# MAGIC * **Central Repository:** Register MLflow models with the MLflow Model Registry. A registered model has a unique name, version, stage, and other metadata.
-# MAGIC * **Model Versioning:** Automatically keep track of versions for registered models when updated.
-# MAGIC * **Model Stage:** Assigned preset or custom stages to each model version, like “Staging” and “Production” to represent the lifecycle of a model.
-# MAGIC * **Model Stage Transitions:** Record new registration events or changes as activities that automatically log users, changes, and additional metadata such as comments.
-# MAGIC * **CI/CD Workflow Integration:** Record stage transitions, request, review and approve changes as part of CI/CD pipelines for better control and governance.
-# MAGIC
-# MAGIC <div><img src="https://files.training.databricks.com/images/eLearning/ML-Part-4/model-registry.png" style="height: 400px; margin: 20px"/></div>
-# MAGIC
-# MAGIC See <a href="https://mlflow.org/docs/latest/registry.html" target="_blank">the MLflow docs</a> for more details on the model registry.
+# MAGIC See <a href="https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/index.html#manage-model-lifecycle-in-unity-catalog" target="_blank">the Databricks docs</a> for more details on the  registering models in Unity Catalog.
 
 # COMMAND ----------
 
@@ -52,7 +40,7 @@
 # MAGIC
 # MAGIC The following workflow will work with either the UI or in pure Python.  This notebook will use pure Python.
 # MAGIC
-# MAGIC Explore the UI throughout this NOTEBOOK by clicking the "Models" tab on the left-hand side of the screen.
+# MAGIC Explore the UI throughout this NOTEBOOK by clicking the "Catalog" tab on the left-hand side of the screen and navigating to the catalog and schema you will be using throughout this exercise.
 
 # COMMAND ----------
 
@@ -88,13 +76,23 @@ from sklearn.model_selection import train_test_split
 
 # user parameters
 user_email = spark.sql('select current_user() as user').collect()[0]['user']
-catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+user_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+catalog_name = "placeholder_catalog"
+schema_name = "placeholder_schema"
 
 # COMMAND ----------
 
-schema_name = "silver"
-table_name = "features"
+# grant create model access to our schema
+spark.sql(f"GRANT CREATE_MODEL ON SCHEMA {catalog_name}.{schema_name} TO `{user_email}`")
 
+# COMMAND ----------
+
+# set registry to your UC
+mlflow.set_registry_uri("databricks-uc")
+
+# COMMAND ----------
+
+table_name = f"features_{user_name}"
 df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
@@ -105,7 +103,6 @@ categorical_cols = ['Geography', 'Gender', ]
 # get_dummies
 enriched_df = pd.get_dummies(df, columns = categorical_cols).astype(np.float64)
 
-
 # train test split 
 X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Exited"], axis=1), enriched_df[["Exited"]].values.ravel(), test_size=0.1, random_state=42)
 
@@ -113,7 +110,7 @@ X_train, X_test, y_train, y_test = train_test_split(enriched_df.drop(["Exited"],
 # COMMAND ----------
 
 # set experiment name 
-experiment = mlflow.set_experiment(f"/Users/{user_email}/opap_mlflow_experiment")
+experiment = mlflow.set_experiment(f"/Users/{user_email}/workshop_mlflow_experiment")
 
 # COMMAND ----------
 
@@ -134,7 +131,7 @@ with mlflow.start_run(run_name="LR Model Autolog") as run:
 
 # COMMAND ----------
 
-model_name = f"{catalog_name}_lr_model"
+model_name = f"{catalog_name}.{schema_name}.lr_model"
 model_name
 
 # COMMAND ----------
@@ -157,13 +154,11 @@ model_details = mlflow.register_model(model_uri=model_uri, name=model_name)
 # MAGIC %md-sandbox <i18n value="fe857eeb-6119-4927-ad79-77eaa7bffe3a"/>
 # MAGIC
 # MAGIC
-# MAGIC  **Open the *Models* tab on the left of the screen to explore the registered model.**  Note the following:<br><br>
+# MAGIC  **Open the *Catalog* tab on the left of the screen, navigate to your user catalog and silver shcema and explore the registered model.**  Note the following:<br><br>
 # MAGIC
 # MAGIC * It logged who trained the model and what code was used
 # MAGIC * It logged a history of actions taken on this model
 # MAGIC * It logged this model as a first version
-# MAGIC
-# MAGIC <div><img src="https://files.training.databricks.com/images/301/registered_model_new.png" style="height: 600px; margin: 20px"/></div>
 
 # COMMAND ----------
 
@@ -214,31 +209,35 @@ client.update_model_version(
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Deploying a Model
+# MAGIC ### Managing a Model
 # MAGIC
-# MAGIC The MLflow Model Registry defines several model stages: **`None`**, **`Staging`**, **`Production`**, and **`Archived`**. Each stage has a unique meaning. For example, **`Staging`** is meant for model testing, while **`Production`** is for models that have completed the testing or review processes and have been deployed to applications. 
+# MAGIC Model aliases and tags help you organize and manage models in Unity Catalog.
 # MAGIC
-# MAGIC Users with appropriate permissions can transition models between stages.
+# MAGIC Model aliases allow you to assign a mutable, named reference to a particular version of a registered model. You can use aliases to indicate the deployment status of a model version. For example, you could allocate a “Champion” alias to the model version currently in production and target this alias in workloads that use the production model. You can then update the production model by reassigning the “Champion” alias to a different model version.
+# MAGIC
+# MAGIC Tags are key-value pairs that you associate with registered models and model versions, allowing you to label and categorize them by function or status.
 
 # COMMAND ----------
 
 # MAGIC %md 
 # MAGIC
 # MAGIC
-# MAGIC Now that you've learned about stage transitions, transition the model to the **`Production`** stage.
+# MAGIC Now that you've learned about aliases and tags, set the model alias to **`Champion`**.
 
 # COMMAND ----------
 
 import time
 
-time.sleep(10) # In case the registration is still pending
+time.sleep(5) # In case the registration is still pending
 
 # COMMAND ----------
 
-client.transition_model_version_stage(
-    name=model_details.name,
-    version=model_details.version,
-    stage="Production"
+alias = "Champion"
+
+client.set_registered_model_alias(
+    name=model_details.name, 
+    alias=alias,
+    version=model_details.version
 )
 
 # COMMAND ----------
@@ -253,7 +252,7 @@ model_version_details = client.get_model_version(
     name=model_details.name,
     version=model_details.version
 )
-print(f"The current model stage is: '{model_version_details.current_stage}'")
+print(f"The current model alias is: '{model_version_details.aliases[0]}'")
 
 # COMMAND ----------
 
@@ -261,13 +260,14 @@ print(f"The current model stage is: '{model_version_details.current_stage}'")
 # MAGIC
 # MAGIC Fetch the latest model using a **`pyfunc`**.  Loading the model in this way allows us to use the model regardless of the package that was used to train it.
 # MAGIC
-# MAGIC NOTE!! You can load a specific version of the model too.
+# MAGIC NOTE!! You can load a specific version of the model too. See example below, where we load version 1 of specified model.
 
 # COMMAND ----------
 
 import mlflow.pyfunc
 
-model_version_uri = f"models:/{model_name}/1"
+desired_model_version = "1"
+model_version_uri = f"models:/{model_name}/{desired_model_version}"
 
 print(f"Loading registered model version from URI: '{model_version_uri}'")
 model_version_1 = mlflow.pyfunc.load_model(model_version_uri)
@@ -286,7 +286,7 @@ model_version_1.predict(X_test)
 
 # MAGIC %md 
 # MAGIC
-# MAGIC ### Deploying a New Model Version
+# MAGIC ### Registering a New Model Version
 # MAGIC
 # MAGIC The MLflow Model Registry enables you to create multiple model versions corresponding to a single registered model. By performing stage transitions, you can seamlessly integrate new model versions into your staging or production environments.
 
@@ -299,6 +299,10 @@ model_version_1.predict(X_test)
 # COMMAND ----------
 
 from sklearn.linear_model import RidgeClassifier
+
+# signature required for UC registry
+from mlflow.models import infer_signature
+signatures = X_train.sample(2)
 
 with mlflow.start_run(run_name="LR Ridge Model") as run:
     alpha = .9
@@ -313,6 +317,7 @@ with mlflow.start_run(run_name="LR Ridge Model") as run:
         sk_model=ridge_classifier,
         artifact_path="sklearn-ridge-model",
         registered_model_name=model_name,
+        input_example=signatures
     )
 
     mlflow.log_params(ridge_classifier.get_params())
@@ -322,18 +327,21 @@ with mlflow.start_run(run_name="LR Ridge Model") as run:
 
 # MAGIC %md 
 # MAGIC
-# MAGIC Put the new model into staging.
+# MAGIC Alias the new model as 'Candidate'.
+# MAGIC
+# MAGIC Use the search functionality to grab the latest model version.
 
 # COMMAND ----------
 
-import time
+alias = "Candidate"
 
-time.sleep(10)
+model_version_infos = client.search_model_versions(f"name = '{model_name}'")
+new_model_version = max([model_version_info.version for model_version_info in model_version_infos])
 
-client.transition_model_version_stage(
-    name=model_details.name,
-    version=2,
-    stage="Staging"
+client.set_registered_model_alias(
+    name=model_details.name, 
+    alias=alias,
+    version=new_model_version
 )
 
 # COMMAND ----------
@@ -344,17 +352,6 @@ client.transition_model_version_stage(
 # MAGIC
 # MAGIC Check the UI to see the new model version.
 # MAGIC
-# MAGIC <div><img src="https://files.training.databricks.com/images/301/model_version_new.png" style="height: 600px; margin: 20px"/></div>
-
-# COMMAND ----------
-
-# MAGIC %md 
-# MAGIC Use the search functionality to grab the latest model version.
-
-# COMMAND ----------
-
-model_version_infos = client.search_model_versions(f"name = '{model_name}'")
-new_model_version = max([model_version_info.version for model_version_info in model_version_infos])
 
 # COMMAND ----------
 
@@ -374,16 +371,40 @@ client.update_model_version(
 
 # MAGIC %md 
 # MAGIC
-# MAGIC Since this model is now in staging, you can execute an automated CI/CD pipeline against it to test it before going into production.  Once that is completed, you can push that model into production.
+# MAGIC Since this model is now a candidate for production, you would execute an automated CI/CD pipeline against it to test it before going into production.
 
 # COMMAND ----------
 
-client.transition_model_version_stage(
-    name=model_name,
-    version=new_model_version,
-    stage="Production", 
-    archive_existing_versions=True # Archive existing model in production 
+# MAGIC %md 
+# MAGIC
+# MAGIC Go to the UI. You will see that your alias for Version 2 of your model has been set to 'candidate', and Version 1 is still aliased as 'champion'.
+# MAGIC
+# MAGIC After you have done your tests, you would promote your 'Candidate' model to 'Champion'. You can load your model just by using its alias, and then set the new alias as before.
+
+# COMMAND ----------
+
+alias = "candidate"
+
+# get the model aliased as 'candidate'
+latest_model = client.get_model_version_by_alias(
+    name=model_details.name, 
+    alias=alias,
 )
+
+# and set that version as champion
+new_alias = "champion"
+
+client.set_registered_model_alias(
+    name=latest_model.name, 
+    alias=new_alias,
+    version=latest_model.version
+)
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC
+# MAGIC Go to the UI. You will see that your alias for Version 2 of your model has been updated to 'champion, but it is still also aliased as 'candidate' too. This is because while a model version can have multiple aliases, there can be no same alias for between versions of the same model. That is why Version 1 automatically lost the alias 'champion'.
 
 # COMMAND ----------
 
@@ -401,8 +422,6 @@ dbutils.notebook.exit("End of notebook when running as a workflow task")
 # MAGIC ### Delete models
 # MAGIC
 # MAGIC Delete version 1.  
-# MAGIC
-# MAGIC NOTE!!! You cannot delete a model that is not first archived.
 
 # COMMAND ----------
 
@@ -415,14 +434,13 @@ client.delete_model_version(
 
 # MAGIC %md
 # MAGIC
-# MAGIC Archive version 2 of the model too.
+# MAGIC Delete version 2 of the model too.
 
 # COMMAND ----------
 
-client.transition_model_version_stage(
+client.delete_model_version(
     name=model_name,
-    version=2,
-    stage="Archived"
+    version=2
 )
 
 # COMMAND ----------
@@ -441,18 +459,18 @@ client.delete_registered_model(model_name)
 # MAGIC
 # MAGIC ## Review
 # MAGIC **Question:** How does MLflow tracking differ from the model registry?  
-# MAGIC **Answer:** Tracking is meant for experimentation and development.  The model registry is designed to take a model from tracking and put it through staging and into production.  This is often the point that a data engineer or a machine learning engineer takes responsibility for the deployment process.
+# MAGIC **Answer:** Tracking is meant for experimentation and development.  The model registry is designed to take a model from tracking and put it into model lifecycle management.  This is often the point that a data engineer or a machine learning engineer takes responsibility for the deployment process.
 # MAGIC
 # MAGIC **Question:** Why do I need a model registry?  
 # MAGIC **Answer:** Just as MLflow tracking provides end-to-end reproducibility for the machine learning training process, a model registry provides reproducibility and governance for the deployment process.  Since production systems are mission critical, components can be isolated with ACL's so only specific individuals can alter production models.  Version control and CI/CD workflow integration is also a critical dimension of deploying models into production.
 # MAGIC
 # MAGIC **Question:** What can I do programmatically versus using the UI?  
-# MAGIC **Answer:** Most operations can be done using the UI or in pure Python.  A model must be tracked using Python, but from that point on everything can be done either way.  For instance, a model logged using the MLflow tracking API can then be registered using the UI and can then be pushed into production.
+# MAGIC **Answer:** Most operations can be done using the UI or in pure Python.  A model must be tracked using Python, but from that point on everything can be done either way.  For instance, a model logged using the MLflow tracking API can then be registered using the UI and can then be aliased or tagged.
 
 # COMMAND ----------
 
 # MAGIC %md 
 # MAGIC
-# MAGIC ## Topics & Resources on the MLflow Model Registry
+# MAGIC ## Topics & Resources on the Model Registry with UC
 # MAGIC
-# MAGIC Check out <a href="https://mlflow.org/docs/latest/registry.html" target="_blank">the MLflow documentation</a>
+# MAGIC Check out <a href="https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/index.html#manage-model-lifecycle-in-unity-catalog" target="_blank">the Databricks documentation</a>

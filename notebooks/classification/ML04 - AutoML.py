@@ -28,15 +28,15 @@
 
 # COMMAND ----------
 
-# set up the below params
+# user parameters
 user_email = spark.sql('select current_user() as user').collect()[0]['user']
-catalog_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+user_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
+catalog_name = "placeholder_catalog"
+schema_name = "placeholder_schema"
 
 # COMMAND ----------
 
-schema_name = "silver"
-table_name = "features"
-
+table_name = f"features_{user_name}"
 df = spark.read.table(f"{catalog_name}.{schema_name}.{table_name}").toPandas()
 
 # COMMAND ----------
