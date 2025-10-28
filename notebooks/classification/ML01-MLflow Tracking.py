@@ -76,8 +76,9 @@ from sklearn.model_selection import train_test_split
 # user parameters
 user_email = spark.sql('select current_user() as user').collect()[0]['user']
 user_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
-catalog_name = "placeholder_catalog"
-schema_name = "placeholder_schema"
+catalog_name = spark.catalog.listCatalogs("*_im*_gold")[0].name
+schema_name = "playground"
+print(f"Using {catalog_name=} and {user_name=}")
 
 # COMMAND ----------
 

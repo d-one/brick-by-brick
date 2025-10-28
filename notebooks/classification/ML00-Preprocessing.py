@@ -31,11 +31,13 @@ import re
 # user parameters
 user_email = spark.sql('select current_user() as user').collect()[0]['user']
 user_name = user_email.split('@')[0].replace(".", "_").replace("-", "_")
-catalog_name = "placeholder_catalog"
+catalog_name = spark.catalog.listCatalogs("*_im*_gold")[0].name
+schema_name = "playground"
+print(f"Using {catalog_name=} and {user_name=}")
 
 # COMMAND ----------
 
-path = f"file:/Workspace/Repos/{user_email}/brick-by-brick/data/churn_modelling.csv"
+path = f"file:/Workspace/Users/{user_email}/brick-by-brick/data/churn_modelling.csv"
 
 dbutils.fs.ls(path)
 
@@ -50,9 +52,9 @@ except:
 
 # write data
 
-catalog_name = "placeholder_catalog"
-schema_name = "placeholder_schema"
 table_name = f"churn_modelling_{user_name}"
+
+print(f"Wrinting table to {catalog_name}.{schema_name}.{table_name}")
 
 sdf_raw.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{table_name}")
 
@@ -125,7 +127,7 @@ features_sdf.printSchema()
 
 target_table_name = f"features_{user_name}"
 
-features_sdf.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{target_schema_name}.{target_table_name}")
+features_sdf.write.format("delta").mode("overwrite").saveAsTable(f"{catalog_name}.{schema_name}.{target_table_name}")
 
 # COMMAND ----------
 
