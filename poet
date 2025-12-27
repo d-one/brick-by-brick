@@ -1,0 +1,26 @@
+[project]
+name = "mlops-dabs"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "mariolito",email = "marios.lioutas@d-one.ai"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy (>=2.4.0,<3.0.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "scikit-learn (>=1.8.0,<2.0.0)",
+    "scipy (>=1.16.3,<2.0.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "azure-identity (>=1.25.1,<2.0.0)",
+    "mlflow (>=3.8.0,<4.0.0)",
+    "mlflow[databricks] (>=3.8.0,<4.0.0)",
+    "seaborn (>=0.13.2,<0.14.0)",
+    "databricks-sdk (>=0.76.0,<0.77.0)",
+]
+[tool.poetry]
+package-mode = false
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

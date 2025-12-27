@@ -1,0 +1,33 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.toml
+
+# Poetry
+.poetry/
+poetry.lock
+
+# Local artifacts
+artifacts/
+data/
+logs/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Tests / notebooks (optional)
+.ipynb_checkpoints/

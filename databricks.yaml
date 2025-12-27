@@ -1,0 +1,43 @@
+bundle:
+  name: iris-pipeline
+
+variables:
+  cluster_id: null
+  artifacts_root: null
+  experiment_name: null
+
+targets:
+  default:
+    variables:
+      cluster_id: 1222-185254-tlu91khc
+      artifacts_root: /Volumes/bronze/bronze_lm_raw/aida/ml_test
+      experiment_name: /Users/marios.lioutas@ms.d-one.ai/ml_test
+
+resources:
+  jobs:
+    iris_pipeline_job:
+      name: iris-pipeline
+      tasks:
+        - task_key: train
+          existing_cluster_id: ${var.cluster_id}
+          spark_python_task:
+            python_file: train_job.py
+            parameters:
+              - --artifacts_path
+              - ${var.artifacts_root}
+              - --experiment_name
+              - ${var.experiment_name}
+
+        - task_key: register
+          depends_on:
+            - task_key: train
+          existing_cluster_id: ${var.cluster_id}
+          spark_python_task:
+            python_file: register_job.py
+            parameters:
+              - --registered_model_name
+              - bronze.bronze_lm_raw.ml_model
+              - --artifacts_path
+              - ${var.artifacts_root}
+              - --experiment_name
+              - ${var.experiment_name}

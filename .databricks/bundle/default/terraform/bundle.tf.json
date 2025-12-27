@@ -1,0 +1,67 @@
+{
+  "terraform": {
+    "required_providers": {
+      "databricks": {
+        "source": "databricks/databricks",
+        "version": "1.100.0"
+      }
+    }
+  },
+  "provider": {
+    "databricks": {}
+  },
+  "resource": {
+    "databricks_job": {
+      "iris_pipeline_job": {
+        "deployment": {
+          "kind": "BUNDLE",
+          "metadata_file_path": "/Workspace/Users/marios.lioutas@ms.d-one.ai/.bundle/iris-pipeline/default/state/metadata.json"
+        },
+        "edit_mode": "UI_LOCKED",
+        "format": "MULTI_TASK",
+        "max_concurrent_runs": 1,
+        "name": "iris-pipeline",
+        "queue": {
+          "enabled": true
+        },
+        "task": [
+          {
+            "depends_on": [
+              {
+                "task_key": "train"
+              }
+            ],
+            "existing_cluster_id": "1222-185254-tlu91khc",
+            "spark_python_task": {
+              "parameters": [
+                "--registered_model_name",
+                "bronze.bronze_lm_raw.ml_model",
+                "--artifacts_path",
+                "/Volumes/bronze/bronze_lm_raw/aida/ml_test",
+                "--experiment_name",
+                "/Users/marios.lioutas@ms.d-one.ai/ml_test"
+              ],
+              "python_file": "/Workspace/Users/marios.lioutas@ms.d-one.ai/.bundle/iris-pipeline/default/files/register_job.py",
+              "source": "WORKSPACE"
+            },
+            "task_key": "register"
+          },
+          {
+            "existing_cluster_id": "1222-185254-tlu91khc",
+            "spark_python_task": {
+              "parameters": [
+                "--artifacts_path",
+                "/Volumes/bronze/bronze_lm_raw/aida/ml_test",
+                "--experiment_name",
+                "/Users/marios.lioutas@ms.d-one.ai/ml_test"
+              ],
+              "python_file": "/Workspace/Users/marios.lioutas@ms.d-one.ai/.bundle/iris-pipeline/default/files/train_job.py",
+              "source": "WORKSPACE"
+            },
+            "task_key": "train"
+          }
+        ]
+      }
+    }
+  }
+}
