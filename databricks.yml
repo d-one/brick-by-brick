@@ -1,5 +1,5 @@
 bundle:
-  name: iris-pipeline
+  name: ml-pipeline-validate
 
 variables:
   cluster_id: null
@@ -10,13 +10,13 @@ targets:
   default:
     variables:
       cluster_id: 1222-185254-tlu91khc
-      artifacts_root: /Volumes/bronze/bronze_lm_raw/aida/ml_test
-      experiment_name: /Users/marios.lioutas@ms.d-one.ai/ml_test
+      artifacts_root: /Volumes/bronze/bronze_lm_raw/aida/ml_validate
+      experiment_name: /Users/marios.lioutas@ms.d-one.ai/ml_validate
 
 resources:
   jobs:
-    iris_pipeline_job:
-      name: iris-pipeline
+    ml_pipeline_validate:
+      name: ml-pipeline-validate
       tasks:
         - task_key: train
           existing_cluster_id: ${var.cluster_id}
@@ -41,3 +41,7 @@ resources:
               - ${var.artifacts_root}
               - --experiment_name
               - ${var.experiment_name}
+              - --code_paths
+              - '["model"]'
+              - --pip_requirements
+              - '["-r requirements.txt"]'

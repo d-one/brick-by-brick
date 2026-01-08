@@ -29,3 +29,11 @@ logs/
 
 # Tests / notebooks (optional)
 .ipynb_checkpoints/
+
+.databricks/*
+.databricks/
+.databricks/bundle/default/deployment.json
+.databricks/bundle/default/sync-snapshots/030c118095d91047.json
+.databricks/bundle/default/sync-snapshots/99bcf89df0963dbe.json
+.databricks/bundle/default/deployment.json
+.databricks/bundle/default/terraform/bundle.tf.json

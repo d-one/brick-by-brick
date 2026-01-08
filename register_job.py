@@ -7,6 +7,7 @@ import subprocess
 import logging
 import joblib
 import mlflow
+import ast
 import pandas as pd
 from mlflow.pyfunc import PythonModel
 from mlflow.models.signature import ModelSignature
@@ -120,16 +121,21 @@ def build_wheel(
     return new_wheel
 
 
-def register(artifacts_path: str, experiment_name: str, python_model: PythonModel, signature: ModelSignature, name: str, registered_model_name: str, code_paths: list[str] = [], pip_requirements: list[str] = [], deploy_endpoint: bool = True):
+
+def register(artifacts_path: str, experiment_name: str, python_model: PythonModel, signature: ModelSignature, name: str, registered_model_name: str, code_paths: list[str] | str = [], pip_requirements: list[str] | str = [], deploy_endpoint: bool = True):
     artifacts_path = Path(artifacts_path)
     install_requirements()
+
+    if type(code_paths) == str:
+        code_paths = ast.literal_eval(code_paths)
+    if type(pip_requirements) == str:
+        pip_requirements = ast.literal_eval(pip_requirements)
     
     if (not code_paths) or (not pip_requirements):
         wheel_path = build_wheel(wheel_name=name)
         wheel_name = wheel_path.split("/")[-1]
         code_paths=[wheel_path]
         pip_requirements=[f"code/{wheel_name}"]
-
     mlflow.set_experiment(experiment_name)
     model_path = artifacts_path / "trained_model.pkl"
     result = mlflow.pyfunc.log_model(
@@ -138,7 +144,7 @@ def register(artifacts_path: str, experiment_name: str, python_model: PythonMode
         signature=signature,
         python_model=python_model(),
         artifacts={"model": str(model_path)},
-        code_paths=code_paths,
+        code_paths=code_paths, # /Workspace/Users/marios.lioutas@ms.d-one.ai/.bundle/iris-pipeline/default
         pip_requirements=pip_requirements,
     )
     model_uri = f"models:/{registered_model_name}/{result.registered_model_version}"
@@ -234,6 +240,8 @@ if __name__ == "__main__":
     parser.add_argument("--experiment_name", default="ml_test")
 
     parser.add_argument("--registered_model_name", default="registered_model_name")
+    parser.add_argument("--code_paths", default=None)
+    parser.add_argument("--pip_requirements", default=None)
     args = parser.parse_args()
     register(
         artifacts_path=args.artifacts_path,
@@ -241,5 +249,7 @@ if __name__ == "__main__":
         signature=signature, 
         name=args.name, 
         registered_model_name=args.registered_model_name,
-        experiment_name=args.experiment_name
+        experiment_name=args.experiment_name,
+        code_paths=args.code_paths,
+        pip_requirements=args.pip_requirements
     )

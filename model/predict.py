@@ -36,7 +36,6 @@ signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 
 class MyModel(PythonModel):
     def load_context(self, context):
-        # Load model from artifacts
         with open(context.artifacts["model"], "rb") as f:
             self.model = pickle.load(f)
         
